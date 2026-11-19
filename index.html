@@ -1,0 +1,791 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CineScope – ค้นพบหนังในดวงใจ</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#09090f;--bg2:#111118;--bg3:#18181f;--bg4:#1e1e28;
+  --gold:#F5C842;--gold-dim:rgba(245,200,66,0.12);--gold-glow:rgba(245,200,66,0.25);
+  --text:#E8E8F0;--muted:#77778a;--muted2:#55556a;
+  --border:rgba(255,255,255,0.07);--border2:rgba(255,255,255,0.12);
+  --rt:#FA4A0A;--radius:12px;--max-w:1280px;
+  --ease:cubic-bezier(.25,.46,.45,.94)
+}
+html{scroll-behavior:smooth}
+body{font-family:'Inter',-apple-system,sans-serif;background:var(--bg);color:var(--text);overflow-x:hidden;min-height:100vh}
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:#2a2a3a;border-radius:3px}
+::-webkit-scrollbar-thumb:hover{background:var(--gold)}
+
+/* ── HEADER ── */
+header{position:sticky;top:0;z-index:100;background:rgba(9,9,15,0.88);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border-bottom:1px solid var(--border)}
+.hdr{display:flex;align-items:center;justify-content:space-between;height:62px;max-width:var(--max-w);margin:0 auto;padding:0 24px;gap:16px}
+.logo{display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--text);font-size:1.25rem;font-weight:900;letter-spacing:-0.5px;flex-shrink:0}
+.logo-mark{width:30px;height:30px;background:var(--gold);border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:.95rem;flex-shrink:0;color:#000}
+nav{display:flex;align-items:center;gap:2px}
+nav a{text-decoration:none;color:var(--muted);font-size:.88rem;font-weight:500;padding:5px 13px;border-radius:20px;transition:all .18s;white-space:nowrap}
+nav a:hover,nav a.active{color:var(--text);background:var(--bg3)}
+.hdr-right{display:flex;align-items:center;gap:8px;flex-shrink:0}
+.hdr-search-btn{background:var(--bg3);border:1px solid var(--border);color:var(--muted);padding:7px 14px;border-radius:20px;cursor:pointer;font-size:.82rem;display:flex;align-items:center;gap:6px;transition:all .18s;font-family:inherit;white-space:nowrap}
+.hdr-search-btn:hover{color:var(--text);border-color:var(--border2)}
+@media(max-width:768px){nav{display:none}}
+
+/* ── HERO ── */
+.hero{position:relative;height:580px;overflow:hidden}
+.hero-film{position:absolute;inset:0;background:linear-gradient(135deg,#0d1b3e 0%,#1a0a2e 50%,#0a150a 100%)}
+.hero-film::before{content:'';position:absolute;inset:0;
+  background-image:radial-gradient(1px 1px at 20% 25%,rgba(255,255,255,.35) 0%,transparent 100%),
+  radial-gradient(1px 1px at 75% 12%,rgba(255,255,255,.4) 0%,transparent 100%),
+  radial-gradient(2px 2px at 60% 55%,rgba(255,255,255,.18) 0%,transparent 100%),
+  radial-gradient(1px 1px at 42% 78%,rgba(255,255,255,.28) 0%,transparent 100%),
+  radial-gradient(1px 1px at 85% 42%,rgba(255,255,255,.32) 0%,transparent 100%),
+  radial-gradient(2px 2px at 15% 50%,rgba(245,200,66,.35) 0%,transparent 100%),
+  radial-gradient(2px 2px at 90% 68%,rgba(245,200,66,.25) 0%,transparent 100%),
+  radial-gradient(1px 1px at 55% 88%,rgba(255,255,255,.2) 0%,transparent 100%)}
+.hero-film::after{content:'';position:absolute;inset:0;
+  background:linear-gradient(to right,rgba(9,9,15,.97) 35%,rgba(9,9,15,.5) 65%,rgba(9,9,15,.2) 100%),
+  linear-gradient(to top,rgba(9,9,15,1) 0%,transparent 50%)}
+.hero-glow{position:absolute;right:12%;top:10%;width:400px;height:400px;
+  background:radial-gradient(ellipse,rgba(13,27,62,.7) 0%,transparent 70%);pointer-events:none}
+.hero-content{position:relative;z-index:2;display:flex;align-items:flex-end;height:100%;padding:0 24px 56px;max-width:var(--max-w);margin:0 auto}
+.hero-info{max-width:560px}
+.hero-badges{display:flex;align-items:center;gap:7px;margin-bottom:14px;flex-wrap:wrap}
+.badge{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:20px;font-size:.72rem;font-weight:700;letter-spacing:.3px}
+.badge-hot{background:var(--gold);color:#000}
+.badge-g{background:rgba(255,255,255,.08);color:var(--muted);border:1px solid var(--border)}
+.hero-title{font-size:clamp(2.2rem,5vw,3.8rem);font-weight:900;letter-spacing:-1px;line-height:.95;margin-bottom:6px}
+.hero-meta{display:flex;align-items:center;gap:14px;margin:12px 0;color:var(--muted);font-size:.88rem;flex-wrap:wrap}
+.s-imdb{display:flex;align-items:center;gap:5px;font-weight:800;color:var(--gold);font-size:.95rem}
+.s-rt{display:flex;align-items:center;gap:5px;font-weight:800;color:var(--rt);font-size:.95rem}
+.hero-syn{color:rgba(232,232,240,.72);font-size:.93rem;line-height:1.65;margin:14px 0;max-width:480px}
+.hero-credit{font-size:.83rem;color:var(--muted)}
+.hero-credit span{color:var(--text);font-weight:600}
+.hero-btns{display:flex;gap:11px;margin-top:22px;flex-wrap:wrap}
+.btn-g{background:var(--gold);color:#000;border:none;padding:11px 26px;border-radius:22px;font-weight:700;font-size:.92rem;cursor:pointer;transition:all .18s;font-family:inherit;white-space:nowrap}
+.btn-g:hover{background:#ffd84d;transform:translateY(-1px)}
+.btn-o{background:rgba(255,255,255,.1);color:var(--text);border:1px solid var(--border2);padding:11px 26px;border-radius:22px;font-weight:600;font-size:.92rem;cursor:pointer;transition:all .18s;font-family:inherit;white-space:nowrap;backdrop-filter:blur(8px)}
+.btn-o:hover{background:rgba(255,255,255,.16)}
+
+/* ── SEARCH ── */
+.search-sec{background:var(--bg2);border-bottom:1px solid var(--border);padding:20px 0}
+.search-wrap{max-width:var(--max-w);margin:0 auto;padding:0 24px}
+.search-bar{display:flex;align-items:center;background:var(--bg3);border:1px solid var(--border);border-radius:11px;padding:0 14px;gap:10px;transition:border-color .2s;margin-bottom:14px}
+.search-bar:focus-within{border-color:var(--gold)}
+.search-bar input{flex:1;background:none;border:none;outline:none;color:var(--text);font-size:.97rem;font-family:inherit;padding:13px 0}
+.search-bar input::placeholder{color:var(--muted)}
+.search-submit{background:var(--gold);color:#000;border:none;padding:7px 18px;border-radius:7px;font-weight:700;font-size:.82rem;cursor:pointer;flex-shrink:0;transition:all .18s;font-family:inherit}
+.search-submit:hover{background:#ffd84d}
+.filters{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.fl{color:var(--muted);font-size:.82rem;font-weight:500;flex-shrink:0}
+.fbtn{background:transparent;border:1px solid var(--border);color:var(--muted);padding:5px 13px;border-radius:20px;font-size:.78rem;font-weight:500;cursor:pointer;transition:all .18s;font-family:inherit;white-space:nowrap}
+.fbtn:hover,.fbtn.active{background:var(--gold-dim);border-color:var(--gold);color:var(--gold)}
+.sel-wrap{position:relative}
+.sel-wrap::after{content:'▾';position:absolute;right:9px;top:50%;transform:translateY(-50%);color:var(--muted);pointer-events:none;font-size:.72rem}
+.fsel{background:var(--bg3);border:1px solid var(--border);color:var(--muted);padding:5px 26px 5px 11px;border-radius:20px;font-size:.78rem;font-family:inherit;cursor:pointer;outline:none;transition:all .18s;-webkit-appearance:none;appearance:none}
+.fsel:hover{border-color:var(--border2);color:var(--text)}
+
+/* ── SECTIONS ── */
+.sec{padding:44px 0}
+.sec-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
+.sec-title{font-size:1.22rem;font-weight:800;display:flex;align-items:center;gap:9px}
+.dot{width:8px;height:8px;background:var(--gold);border-radius:50%;flex-shrink:0}
+.dot.pulse{animation:dpulse 2s infinite}
+@keyframes dpulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(.7)}}
+.see-all{color:var(--gold);text-decoration:none;font-size:.82rem;font-weight:600;opacity:.75;transition:opacity .18s;white-space:nowrap}
+.see-all:hover{opacity:1}
+hr.div{border:none;border-top:1px solid var(--border)}
+
+/* ── SCROLL ROW ── */
+.row{display:flex;gap:14px;overflow-x:auto;padding-bottom:10px;scrollbar-width:none;-ms-overflow-style:none}
+.row::-webkit-scrollbar{display:none}
+
+/* ── GRID ── */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:14px}
+@media(max-width:600px){.grid{grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px}}
+
+/* ── MOVIE CARD ── */
+.card{flex-shrink:0;width:170px;cursor:pointer;transition:transform .22s var(--ease)}
+.card:hover{transform:translateY(-5px)}
+.card.gc{width:auto}
+.poster{width:100%;aspect-ratio:2/3;border-radius:var(--radius);overflow:hidden;position:relative;margin-bottom:9px;border:1px solid var(--border)}
+.poster-inner{width:100%;height:100%;position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center}
+.poster-icon{position:absolute;font-size:4.5rem;opacity:.07;user-select:none}
+.poster-grad{position:absolute;bottom:0;left:0;right:0;height:65%;background:linear-gradient(to top,rgba(0,0,0,.92),transparent)}
+.poster-top{position:absolute;bottom:0;left:0;right:0;padding:20px 10px 10px;font-size:.72rem;font-weight:700;text-align:center;line-height:1.3}
+.poster-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.hero-poster{position:absolute;right:7%;top:50%;transform:translateY(-50%) rotate(-2deg);width:200px;aspect-ratio:2/3;border-radius:16px;overflow:hidden;box-shadow:0 24px 64px rgba(0,0,0,.85);z-index:3;border:1px solid rgba(255,255,255,.12);transition:transform .32s}
+.hero-poster:hover{transform:translateY(-50%) rotate(0deg) scale(1.03)}
+.hero-poster img{width:100%;height:100%;display:block;object-fit:cover}
+@media(max-width:960px){.hero-poster{display:none}}
+.yr-badge{position:absolute;top:7px;left:7px;background:rgba(0,0,0,.65);backdrop-filter:blur(4px);padding:2px 7px;border-radius:20px;font-size:.67rem;font-weight:600;color:var(--muted)}
+.imdb-badge{position:absolute;top:7px;right:7px;background:rgba(245,200,66,.92);color:#000;padding:2px 6px;border-radius:4px;font-size:.67rem;font-weight:800}
+.card-title{font-size:.85rem;font-weight:700;line-height:1.3;margin-bottom:4px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.card-meta{display:flex;align-items:center;gap:7px;flex-wrap:wrap}
+.mi{font-size:.72rem;font-weight:700;color:var(--gold);display:flex;align-items:center;gap:2px}
+.mrt{font-size:.72rem;font-weight:700;color:var(--rt);display:flex;align-items:center;gap:2px}
+.myr{font-size:.7rem;color:var(--muted)}
+
+/* ── NO RESULTS ── */
+.empty{text-align:center;padding:48px 24px;color:var(--muted);grid-column:1/-1}
+.empty-icon{font-size:2.8rem;margin-bottom:14px;opacity:.5}
+
+/* ── MODAL ── */
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.9);z-index:200;align-items:center;justify-content:center;padding:16px;backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)}
+.overlay.open{display:flex}
+.modal{background:var(--bg2);border-radius:22px;border:1px solid var(--border2);max-width:740px;width:100%;overflow:hidden;animation:min .28s var(--ease);display:flex;max-height:90vh}
+@keyframes min{from{opacity:0;transform:scale(.93) translateY(20px)}to{opacity:1;transform:scale(1) translateY(0)}}
+.m-poster-wrap{flex-shrink:0;width:240px;position:relative;overflow:hidden;background:var(--bg3)}
+.m-poster-wrap img{width:100%;height:100%;object-fit:cover;display:block}
+.m-poster-fb{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;padding:28px;text-align:center}
+.m-poster-fb-icon{font-size:5.5rem;line-height:1;filter:drop-shadow(0 6px 18px rgba(0,0,0,.6))}
+.m-poster-fb-title{font-size:.95rem;font-weight:800;line-height:1.4;color:var(--text);text-shadow:0 2px 10px rgba(0,0,0,.8)}
+.m-poster-fb-genre{font-size:.75rem;color:rgba(255,255,255,.45);font-weight:500;letter-spacing:.5px}
+.m-right{flex:1;position:relative;display:flex;flex-direction:column;min-width:0;overflow:hidden}
+.m-close{position:absolute;top:14px;right:14px;width:32px;height:32px;background:rgba(0,0,0,.7);border:1px solid rgba(255,255,255,.12);border-radius:50%;color:rgba(255,255,255,.8);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:.9rem;backdrop-filter:blur(6px);z-index:5;transition:all .18s}
+.m-close:hover{background:rgba(0,0,0,.92);color:#fff;transform:scale(1.08)}
+.m-body{padding:30px 26px 26px;overflow-y:auto;flex:1;scrollbar-width:thin;scrollbar-color:#2a2a3a transparent}
+.m-body::-webkit-scrollbar{width:4px}
+.m-body::-webkit-scrollbar-thumb{background:#2a2a3a;border-radius:2px}
+@media(max-width:600px){.modal{flex-direction:column;max-height:93vh}.m-poster-wrap{width:100%;height:220px;flex-shrink:0}}
+.m-title{font-size:1.65rem;font-weight:900;letter-spacing:-.5px;margin-bottom:7px}
+.m-scores{display:flex;align-items:center;gap:12px;margin-bottom:14px;flex-wrap:wrap}
+.sc-imdb{display:flex;align-items:center;gap:7px;background:rgba(245,200,66,.1);border:1px solid rgba(245,200,66,.25);padding:5px 13px;border-radius:7px}
+.sc-imdb .lbl{font-size:.75rem;font-weight:800;background:var(--gold);color:#000;padding:1px 5px;border-radius:3px}
+.sc-imdb .num{font-size:1.05rem;font-weight:800;color:var(--gold)}
+.sc-rt{display:flex;align-items:center;gap:7px;background:rgba(250,74,10,.1);border:1px solid rgba(250,74,10,.25);padding:5px 13px;border-radius:7px}
+.sc-rt .lbl{font-size:.75rem;font-weight:800;color:var(--rt)}
+.sc-rt .num{font-size:1.05rem;font-weight:800;color:var(--rt)}
+.m-meta-txt{font-size:.83rem;color:var(--muted)}
+.m-syn{color:rgba(232,232,240,.75);font-size:.92rem;line-height:1.65;margin-bottom:18px}
+.m-dets{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-bottom:18px}
+.m-det{display:flex;flex-direction:column;gap:2px}
+.det-lbl{font-size:.72rem;color:var(--muted);font-weight:500;text-transform:uppercase;letter-spacing:.5px}
+.det-val{font-size:.88rem;font-weight:600}
+.m-tags{display:flex;gap:7px;flex-wrap:wrap}
+.g-pill{background:var(--bg3);border:1px solid var(--border);padding:3px 11px;border-radius:20px;font-size:.77rem;color:var(--muted)}
+.m-stream{margin-top:18px}
+.stream-lbl{font-size:.72rem;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.5px;display:block;margin-bottom:8px}
+.stream-badges{display:flex;gap:7px;flex-wrap:wrap}
+.plat{display:inline-flex;align-items:center;gap:5px;padding:5px 11px;border-radius:7px;font-size:.76rem;font-weight:800;cursor:default;letter-spacing:.2px;white-space:nowrap}
+.plat-netflix{background:#e50914;color:#fff}
+.plat-disney{background:#0063e5;color:#fff}
+.plat-prime{background:#00a8e0;color:#000}
+.plat-max{background:#002be7;color:#fff}
+.plat-apple{background:#1a1a1a;color:#fff;border:1px solid #333}
+.plat-mubi{background:#ff7733;color:#fff}
+.plat-hulu{background:#1ce783;color:#000}
+.plat-paramount{background:#0064ff;color:#fff}
+.plat-peacock{background:#f5f5f5;color:#000}
+
+/* ── CHATBOX ── */
+.fab{position:fixed;bottom:26px;right:26px;width:54px;height:54px;background:var(--gold);border-radius:50%;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:1.3rem;box-shadow:0 8px 24px rgba(245,200,66,.4);transition:all .2s;z-index:150}
+.fab:hover{transform:scale(1.1);box-shadow:0 12px 32px rgba(245,200,66,.5)}
+.fab-badge{position:absolute;top:-2px;right:-2px;width:17px;height:17px;background:var(--rt);border-radius:50%;border:2px solid var(--bg);font-size:.6rem;font-weight:800;color:#fff;display:flex;align-items:center;justify-content:center}
+.chat{position:fixed;bottom:92px;right:26px;width:355px;height:490px;background:var(--bg2);border:1px solid var(--border2);border-radius:20px;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.55);z-index:150;transition:all .28s var(--ease);transform:scale(.95) translateY(14px);opacity:0;pointer-events:none}
+.chat.open{transform:scale(1) translateY(0);opacity:1;pointer-events:all}
+@media(max-width:450px){.chat{width:calc(100vw - 32px);right:16px}}
+.chat-hdr{padding:14px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:9px;background:var(--bg3);flex-shrink:0}
+.ai-av{width:34px;height:34px;background:var(--gold);border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:.95rem;flex-shrink:0;color:#000}
+.chat-ttl{font-weight:700;font-size:.92rem}
+.chat-sub{font-size:.72rem;color:var(--muted)}
+.chat-x{margin-left:auto;background:none;border:none;color:var(--muted);cursor:pointer;font-size:1rem;padding:3px;transition:color .18s}
+.chat-x:hover{color:var(--text)}
+.msgs{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:11px;scrollbar-width:none}
+.msgs::-webkit-scrollbar{display:none}
+.msg{display:flex;flex-direction:column;max-width:87%}
+.msg.u{align-self:flex-end;align-items:flex-end}
+.msg.a{align-self:flex-start}
+.bubble{padding:9px 13px;border-radius:15px;font-size:.845rem;line-height:1.52}
+.msg.u .bubble{background:var(--gold);color:#000;border-bottom-right-radius:4px;font-weight:500}
+.msg.a .bubble{background:var(--bg3);border:1px solid var(--border);color:var(--text);border-bottom-left-radius:4px}
+.msg-time{font-size:.62rem;color:var(--muted);margin-top:3px;padding:0 3px}
+.quick-row{padding:0 14px 10px;display:flex;gap:6px;flex-wrap:wrap;flex-shrink:0}
+.qbtn{background:var(--bg3);border:1px solid var(--border);color:var(--muted);padding:4px 11px;border-radius:20px;font-size:.73rem;cursor:pointer;transition:all .18s;font-family:inherit;white-space:nowrap}
+.qbtn:hover{border-color:var(--gold);color:var(--gold)}
+.chat-foot{padding:10px 14px;border-top:1px solid var(--border);display:flex;gap:7px;align-items:center;background:var(--bg3);flex-shrink:0}
+.chat-in{flex:1;background:var(--bg2);border:1px solid var(--border);color:var(--text);padding:9px 13px;border-radius:20px;font-size:.845rem;font-family:inherit;outline:none;transition:border-color .18s}
+.chat-in:focus{border-color:var(--gold)}
+.chat-in::placeholder{color:var(--muted)}
+.send-btn{width:34px;height:34px;background:var(--gold);color:#000;border:none;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:.85rem;flex-shrink:0;transition:all .18s}
+.send-btn:hover{background:#ffd84d;transform:scale(1.05)}
+.typing{display:flex;gap:4px;padding:9px 13px;background:var(--bg3);border:1px solid var(--border);border-radius:15px;border-bottom-left-radius:4px;width:fit-content}
+.td{width:6px;height:6px;background:var(--muted);border-radius:50%;animation:tp 1.4s infinite}
+.td:nth-child(2){animation-delay:.22s}
+.td:nth-child(3){animation-delay:.44s}
+@keyframes tp{0%,60%,100%{transform:translateY(0);opacity:.4}30%{transform:translateY(-5px);opacity:1}}
+
+/* ── FOOTER ── */
+footer{background:var(--bg2);border-top:1px solid var(--border);padding:28px 0;margin-top:44px}
+.foot-in{max-width:var(--max-w);margin:0 auto;padding:0 24px;display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap}
+.foot-brand{font-weight:800;font-size:.97rem;display:flex;align-items:center;gap:8px;margin-bottom:4px}
+.foot-copy{font-size:.77rem;color:var(--muted)}
+.foot-links{display:flex;gap:18px}
+.foot-links a{color:var(--muted);text-decoration:none;font-size:.82rem;transition:color .18s}
+.foot-links a:hover{color:var(--text)}
+
+/* ── SCROLL TOP ── */
+.top-btn{position:fixed;bottom:92px;left:26px;width:38px;height:38px;background:var(--bg3);border:1px solid var(--border);border-radius:50%;color:var(--muted);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:.95rem;transition:all .2s;z-index:50;opacity:0;pointer-events:none}
+.top-btn.vis{opacity:1;pointer-events:all}
+.top-btn:hover{color:var(--text);border-color:var(--border2)}
+
+/* ── FADE IN ── */
+.fi{animation:fi .45s ease both}
+@keyframes fi{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+  <div class="hdr">
+    <a class="logo" href="#"><div class="logo-mark">🎬</div>CineScope</a>
+    <nav>
+      <a href="#" class="active">หน้าหลัก</a>
+      <a href="#trending">เทรนดิ้ง</a>
+      <a href="#top">คะแนนสูง</a>
+      <a href="#genres">หมวดหมู่</a>
+    </nav>
+    <div class="hdr-right">
+      <button class="hdr-search-btn" onclick="document.getElementById('si').focus()">🔍 ค้นหาหนัง</button>
+    </div>
+  </div>
+</header>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-film"></div>
+  <div class="hero-glow"></div>
+  <div class="hero-poster">
+    <img src="https://image.tmdb.org/t/p/w500/cdqLnri3NEGcmfnqwk2TSIYtddg.jpg" alt="Dune: Part Two" onerror="this.parentElement.style.display='none'">
+  </div>
+  <div class="hero-content">
+    <div class="hero-info">
+      <div class="hero-badges">
+        <span class="badge badge-hot">⭐ แนะนำสัปดาห์นี้</span>
+        <span class="badge badge-g">Sci-Fi</span>
+        <span class="badge badge-g">Adventure</span>
+      </div>
+      <h1 class="hero-title">Dune:<br>Part Two</h1>
+      <div class="hero-meta">
+        <span>2024</span><span>·</span><span>2h 46m</span><span>·</span>
+        <div class="s-imdb">⭐ 8.5 <span style="font-weight:400;font-size:.77rem;color:var(--muted)">IMDb</span></div>
+        <div class="s-rt">🍅 92% <span style="font-weight:400;font-size:.77rem;color:var(--muted)">RT</span></div>
+      </div>
+      <p class="hero-syn">Paul Atreides รวมพลังกับ Chani และชาว Fremen ขณะแสวงหาการแก้แค้นต่อผู้ที่ทำลายครอบครัว การเผชิญหน้าครั้งยิ่งใหญ่ที่จะเปลี่ยนอนาคตของจักรวาล</p>
+      <p class="hero-credit">กำกับโดย <span>Denis Villeneuve</span> · นำแสดง <span>Timothée Chalamet, Zendaya</span></p>
+      <div class="hero-btns">
+        <button class="btn-g" onclick="openModal(0)">▶ ข้อมูลเพิ่มเติม</button>
+        <button class="btn-o" onclick="openChatWith('แนะนำหนังคล้าย Dune Part Two')">🤖 ถาม AI แนะนำ</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SEARCH -->
+<section class="search-sec">
+  <div class="search-wrap">
+    <div class="search-bar">
+      <span style="color:var(--muted);flex-shrink:0">🔍</span>
+      <input type="text" id="si" placeholder="ค้นหาชื่อหนัง, ผู้กำกับ, นักแสดง, แนวหนัง..." oninput="doSearch(this.value)">
+      <button class="search-submit" onclick="doSearch(document.getElementById('si').value)">ค้นหา</button>
+    </div>
+    <div class="filters">
+      <span class="fl">กรอง:</span>
+      <button class="fbtn active" onclick="setGenre('all',this)">ทั้งหมด</button>
+      <button class="fbtn" onclick="setGenre('Action',this)">แอ็คชั่น</button>
+      <button class="fbtn" onclick="setGenre('Drama',this)">ดราม่า</button>
+      <button class="fbtn" onclick="setGenre('Horror',this)">สยองขวัญ</button>
+      <button class="fbtn" onclick="setGenre('Sci-Fi',this)">ไซ-ไฟ</button>
+      <button class="fbtn" onclick="setGenre('Comedy',this)">คอเมดี้</button>
+      <button class="fbtn" onclick="setGenre('Thriller',this)">ระทึกขวัญ</button>
+      <button class="fbtn" onclick="setGenre('Animation',this)">แอนิเมชั่น</button>
+      <div class="sel-wrap">
+        <select class="fsel" id="yr-sel" onchange="setYear(this.value)">
+          <option value="all">ทุกปี</option>
+          <option value="2024">2024</option>
+          <option value="2023">2023</option>
+          <option value="2022">2022</option>
+          <option value="2021">2021</option>
+          <option value="2019">2019</option>
+          <option value="2018">2018</option>
+          <option value="2014">2014</option>
+          <option value="2008">2008</option>
+        </select>
+      </div>
+      <div class="sel-wrap">
+        <select class="fsel" id="sort-sel" onchange="doSort(this.value)">
+          <option value="default">เทรนดิ้ง</option>
+          <option value="imdb">คะแนน IMDb</option>
+          <option value="rt">คะแนน RT</option>
+          <option value="new">ใหม่สุด</option>
+          <option value="old">เก่าสุด</option>
+        </select>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CONTENT -->
+<div style="max-width:var(--max-w);margin:0 auto;padding:0 24px">
+
+  <!-- Search Results (hidden by default) -->
+  <section class="sec" id="res-sec" style="display:none">
+    <div class="sec-hdr"><h2 class="sec-title" id="res-title"><span class="dot"></span>ผลการค้นหา</h2></div>
+    <div class="grid" id="res-grid"></div>
+  </section>
+
+  <!-- Trending -->
+  <section class="sec" id="trending">
+    <div class="sec-hdr">
+      <h2 class="sec-title"><span class="dot pulse"></span>กำลังเทรนด์ 🔥</h2>
+      <a href="#" class="see-all">ดูทั้งหมด →</a>
+    </div>
+    <div class="row" id="trend-row"></div>
+  </section>
+
+  <hr class="div">
+
+  <!-- Top Rated -->
+  <section class="sec" id="top">
+    <div class="sec-hdr">
+      <h2 class="sec-title"><span class="dot"></span>คะแนนสูงสุด ⭐</h2>
+      <a href="#" class="see-all">ดูทั้งหมด →</a>
+    </div>
+    <div class="grid" id="top-grid"></div>
+  </section>
+
+  <hr class="div">
+
+  <!-- Genres -->
+  <section class="sec" id="genres">
+    <div class="sec-hdr"><h2 class="sec-title"><span class="dot"></span>Sci-Fi & Adventure 🚀</h2><a href="#" class="see-all">ดูทั้งหมด →</a></div>
+    <div class="row" id="scifi-row"></div>
+  </section>
+
+  <section class="sec">
+    <div class="sec-hdr"><h2 class="sec-title"><span class="dot"></span>สยองขวัญ & ระทึกขวัญ 👻</h2><a href="#" class="see-all">ดูทั้งหมด →</a></div>
+    <div class="row" id="horror-row"></div>
+  </section>
+
+  <section class="sec">
+    <div class="sec-hdr"><h2 class="sec-title"><span class="dot"></span>ดราม่า & ศิลปะ 🎭</h2><a href="#" class="see-all">ดูทั้งหมด →</a></div>
+    <div class="row" id="drama-row"></div>
+  </section>
+
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="foot-in">
+    <div>
+      <div class="foot-brand">🎬 CineScope</div>
+      <div class="foot-copy">© 2024 CineScope · ค้นพบหนังในดวงใจด้วย AI · คะแนนอ้างอิงจาก IMDb & Rotten Tomatoes</div>
+    </div>
+    <div class="foot-links">
+      <a href="#">เกี่ยวกับเรา</a>
+      <a href="#">นโยบาย</a>
+      <a href="#">ติดต่อ</a>
+    </div>
+  </div>
+</footer>
+
+<!-- CHAT FAB -->
+<button class="fab" onclick="toggleChat()" title="ถามAI แนะนำหนัง">
+  🤖<span class="fab-badge">AI</span>
+</button>
+
+<!-- CHAT PANEL -->
+<div class="chat" id="chat-panel">
+  <div class="chat-hdr">
+    <div class="ai-av">🤖</div>
+    <div><div class="chat-ttl">CineScope AI</div><div class="chat-sub">ถามฉันเรื่องหนังได้เลย! 🎬</div></div>
+    <button class="chat-x" onclick="toggleChat()">✕</button>
+  </div>
+  <div class="msgs" id="msgs">
+    <div class="msg a">
+      <div class="bubble">สวัสดี! ฉันคือ CineScope AI 🎬<br><br>บอกฉันว่าชอบหนังแนวไหน หรือถามเรื่องหนังที่สนใจได้เลย เช่น &ldquo;แนะนำหนัง Sci-Fi&rdquo; หรือ &ldquo;หนังดีปี 2024&rdquo;</div>
+      <span class="msg-time">ตอนนี้</span>
+    </div>
+  </div>
+  <div class="quick-row">
+    <button class="qbtn" onclick="quickMsg('แนะนำหนัง Sci-Fi')">🚀 Sci-Fi</button>
+    <button class="qbtn" onclick="quickMsg('หนังสยองขวัญน่ากลัว')">👻 สยองขวัญ</button>
+    <button class="qbtn" onclick="quickMsg('หนังได้ออสการ์')">🏆 ออสการ์</button>
+    <button class="qbtn" onclick="quickMsg('หนังยอดนิยมปี 2024')">🔥 2024</button>
+    <button class="qbtn" onclick="quickMsg('หนังดราม่าซึ้ง')">🎭 ดราม่า</button>
+  </div>
+  <div class="chat-foot">
+    <input class="chat-in" id="chat-in" placeholder="ถามเรื่องหนัง..." onkeydown="if(event.key==='Enter')sendChat()">
+    <button class="send-btn" onclick="sendChat()">➤</button>
+  </div>
+</div>
+
+<!-- SCROLL TOP -->
+<button class="top-btn" id="top-btn" onclick="window.scrollTo({top:0,behavior:'smooth'})" title="ขึ้นบน">↑</button>
+
+<!-- MODAL -->
+<div class="overlay" id="modal-ov" onclick="if(event.target===this)closeModal()">
+  <div class="modal">
+    <div id="m-poster-wrap" class="m-poster-wrap"></div>
+    <div class="m-right">
+      <button class="m-close" onclick="closeModal()">✕</button>
+      <div class="m-body">
+        <h2 class="m-title" id="m-ttl"></h2>
+        <div class="m-scores">
+          <div class="sc-imdb"><span class="lbl">IMDb</span><span class="num" id="m-imdb"></span><span style="font-size:.77rem;color:var(--muted)">/10</span></div>
+          <div class="sc-rt"><span class="lbl">🍅 RT</span><span class="num" id="m-rt"></span></div>
+          <span class="m-meta-txt" id="m-meta"></span>
+        </div>
+        <p class="m-syn" id="m-syn"></p>
+        <div class="m-dets">
+          <div class="m-det"><span class="det-lbl">ผู้กำกับ</span><span class="det-val" id="m-dir"></span></div>
+          <div class="m-det"><span class="det-lbl">ปีที่ฉาย</span><span class="det-val" id="m-yr"></span></div>
+          <div class="m-det"><span class="det-lbl">ความยาว</span><span class="det-val" id="m-dur"></span></div>
+          <div class="m-det"><span class="det-lbl">นักแสดงนำ</span><span class="det-val" id="m-cast"></span></div>
+        </div>
+        <div class="m-tags" id="m-tags"></div>
+        <div class="m-stream" id="m-stream" style="display:none">
+          <span class="stream-lbl">▶ ดูแบบถูกลิขสิทธิ์ได้ที่</span>
+          <div class="stream-badges" id="m-badges"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ═══ DATA ═══
+const MOVIES = [
+  {id:0,title:"Dune: Part Two",year:2024,genre:["Sci-Fi","Adventure","Drama"],imdb:8.5,rt:92,syn:"Paul Atreides รวมพลังกับ Chani และชาว Fremen ขณะแสวงหาการแก้แค้น การเผชิญหน้าครั้งยิ่งใหญ่ที่จะเปลี่ยนอนาคตของจักรวาล",dir:"Denis Villeneuve",cast:"Timothée Chalamet, Zendaya, Rebecca Ferguson",dur:"2h 46m",rating:"PG-13",c:["#0d1b3e","#1a0a2e"],img:"https://image.tmdb.org/t/p/w500/1pdfLvkbY9ohJlCjQH2CZjjYVvJ.jpg",trend:1},
+  {id:1,title:"The Substance",year:2024,genre:["Horror","Sci-Fi","Drama"],imdb:7.0,rt:89,syn:"ดาราสาวค้นพบยาลึกลับที่สร้างตัวตนใหม่ที่อายุน้อยกว่า ผลลัพธ์ที่ตามมาคือฝันร้ายที่ไม่มีวันสิ้นสุด",dir:"Coralie Fargeat",cast:"Demi Moore, Margaret Qualley",dur:"2h 20m",rating:"R",c:["#1a0a1a","#2a0808"],img:"https://image.tmdb.org/t/p/w500/lqoMzCcZYEFK729d6qzt349fB4o.jpg",trend:1},
+  {id:2,title:"Alien: Romulus",year:2024,genre:["Horror","Sci-Fi","Action"],imdb:7.4,rt:80,syn:"กลุ่มนักล่าดาวเคราะห์เดินทางไปสถานีอวกาศร้างและค้นพบสิ่งน่าสยดสยองที่สุดในจักรวาล",dir:"Fede Álvarez",cast:"Cailee Spaeny, David Jonsson",dur:"1h 59m",rating:"R",c:["#0a1a10","#1a2a0a"],img:"https://image.tmdb.org/t/p/w500/b33nnKl1GSFbao4l3fZDDqsMx0F.jpg",trend:1},
+  {id:3,title:"Deadpool & Wolverine",year:2024,genre:["Action","Comedy","Superhero"],imdb:7.6,rt:79,syn:"Deadpool และ Wolverine ต้องจับมือกันต่อสู้กับภัยคุกคามใหม่ที่จะทำลายล้างจักรวาล",dir:"Shawn Levy",cast:"Ryan Reynolds, Hugh Jackman",dur:"2h 7m",rating:"R",c:["#2a0a0a","#0a0a2a"],img:"https://image.tmdb.org/t/p/w500/8cdWjvZQUExUUTzyp4t6EDMubfO.jpg",trend:1},
+  {id:4,title:"Inside Out 2",year:2024,genre:["Animation","Comedy","Drama"],imdb:7.6,rt:90,syn:"Riley เข้าสู่วัยรุ่น Joy พร้อมเพื่อนต้องเผชิญอารมณ์ใหม่ที่นำโดย Anxiety ที่กำลังเข้ายึดครองทุกอย่าง",dir:"Kelsey Mann",cast:"Amy Poehler, Maya Hawke",dur:"1h 40m",rating:"PG",c:["#1a1a0a","#0a1a2a"],img:"https://image.tmdb.org/t/p/w500/vpnVM9B6NMmQpWeZvzLvDESb2QY.jpg",trend:1},
+  {id:5,title:"Hit Man",year:2024,genre:["Thriller","Comedy","Romance"],imdb:7.6,rt:97,syn:"อาจารย์เรียบร้อยรับงานแสร้งทำเป็นมือสังหารให้ FBI แต่เมื่อตกหลุมรักลูกค้า ทุกอย่างพลิกผัน",dir:"Richard Linklater",cast:"Glen Powell, Adria Arjona",dur:"1h 55m",rating:"R",c:["#1a0a2a","#0a1a1a"],img:"https://image.tmdb.org/t/p/w500/3V4kLQg0kSqhLljzt3NKkHdf3im.jpg",trend:1},
+  {id:6,title:"Furiosa",year:2024,genre:["Action","Adventure","Sci-Fi"],imdb:7.8,rt:90,syn:"ต้นกำเนิดของ Furiosa นักรบหญิงผู้โหดเหี้ยม จากเด็กหญิงผู้ถูกพรากมาสู่นักรบที่ไม่มีใครกล้าสู้",dir:"George Miller",cast:"Anya Taylor-Joy, Chris Hemsworth",dur:"2h 28m",rating:"R",c:["#2a1a0a","#1a0a0a"],img:"https://image.tmdb.org/t/p/w500/iADOJ8Zymht2JPMoy3R7xceZprc.jpg",trend:1},
+  {id:7,title:"Twisters",year:2024,genre:["Action","Adventure","Thriller"],imdb:7.1,rt:79,syn:"นักล่าพายุรุ่นใหม่ค้นพบวิธีเอาชนะธรรมชาติ ต้องเผชิญกับพายุทอร์นาโดที่ใหญ่และรุนแรงที่สุดเท่าที่มีมา",dir:"Lee Isaac Chung",cast:"Daisy Edgar-Jones, Glen Powell",dur:"2h 2m",rating:"PG-13",c:["#0a1a2a","#0a2a1a"],img:"https://image.tmdb.org/t/p/w500/2ZPnBOYUKqGNEZ9Ixu6mXLiuC.jpg",trend:1},
+  {id:8,title:"Oppenheimer",year:2023,genre:["Drama","History","Thriller"],imdb:8.9,rt:93,syn:"ชีวิตของ J. Robert Oppenheimer ผู้บิดาแห่งระเบิดปรมาณู และวันที่เขาต้องตัดสินใจที่เปลี่ยนโลกตลอดกาล",dir:"Christopher Nolan",cast:"Cillian Murphy, Emily Blunt, Matt Damon",dur:"3h 0m",rating:"R",c:["#1a0a0a","#2a1a0a"],img:"https://image.tmdb.org/t/p/w500/8Gxv8giaFIzmZDmhR25Mf3GGHtl.jpg",top:1},
+  {id:9,title:"Past Lives",year:2023,genre:["Drama","Romance"],imdb:7.9,rt:97,syn:"สองคนเกาหลีที่เติบโตมาด้วยกันแล้วแยกจากกัน พบกันอีกครั้งในนิวยอร์กหลายสิบปีต่อมา เผชิญกับชะตากรรมและความรักที่ค้างคา",dir:"Celine Song",cast:"Greta Lee, Teo Yoo",dur:"1h 45m",rating:"PG-13",c:["#0a1a2a","#1a0a2a"],img:"https://image.tmdb.org/t/p/w500/k3waqVXkbKQkEQMBQEvhcagSRfW.jpg",top:1},
+  {id:10,title:"Poor Things",year:2023,genre:["Sci-Fi","Drama","Comedy"],imdb:7.9,rt:91,syn:"เบลลาผู้หญิงที่ถูกฟื้นคืนชีพด้วยการทดลองทางวิทยาศาสตร์ เดินทางผจญภัยข้ามโลกและค้นพบความหมายของชีวิต",dir:"Yorgos Lanthimos",cast:"Emma Stone, Mark Ruffalo, Willem Dafoe",dur:"2h 21m",rating:"R",c:["#1a1a2a","#0a1a0a"],img:"https://image.tmdb.org/t/p/w500/kCGlIMHnOm8JPXIf6OiRV3UOGMJ.jpg",top:1},
+  {id:11,title:"The Holdovers",year:2023,genre:["Drama","Comedy"],imdb:7.9,rt:95,syn:"ครูผู้เข้มงวดต้องดูแลนักเรียนที่ไม่มีที่ไปในช่วงคริสต์มาส ความสัมพันธ์ที่ไม่คาดฝันก็ก่อตัวขึ้น",dir:"Alexander Payne",cast:"Paul Giamatti, Dominic Sessa",dur:"2h 13m",rating:"R",c:["#1a1a0a","#0a0a1a"],img:"https://image.tmdb.org/t/p/w500/VHmGX7lHnHPbF77TE2zxFlRMTi.jpg",top:1},
+  {id:12,title:"Fallen Leaves",year:2023,genre:["Drama","Romance","Comedy"],imdb:7.6,rt:99,syn:"สองคนโดดเดี่ยวในเฮลซิงกิพบกันและพยายามสร้างความสัมพันธ์ท่ามกลางอุปสรรคนานา",dir:"Aki Kaurismäki",cast:"Alma Pöysti, Jussi Vatanen",dur:"1h 21m",rating:"PG",c:["#1a0a0a","#0a1a1a"],img:"https://image.tmdb.org/t/p/w500/mjO3uJAkOrq5G0VwxFPL9EZU7uQ.jpg",top:1},
+  {id:13,title:"All of Us Strangers",year:2023,genre:["Drama","Romance","Fantasy"],imdb:7.4,rt:97,syn:"นักเขียนบทกลับไปเยี่ยมบ้านเกิดและพบกับพ่อแม่ที่เสียชีวิตไปแล้ว ขณะเริ่มต้นความสัมพันธ์กับเพื่อนบ้านที่ลึกลับ",dir:"Andrew Haigh",cast:"Andrew Scott, Paul Mescal",dur:"1h 45m",rating:"R",c:["#0a0a1a","#1a0a1a"],img:"https://image.tmdb.org/t/p/w500/e1pDiVHfQ7VTH3EmGMU0R6kVE2D.jpg",top:1},
+  {id:14,title:"Killers of the Flower Moon",year:2023,genre:["Drama","History","Crime"],imdb:7.6,rt:93,syn:"ในช่วงทศวรรษ 1920 ชาวโอเซจในโอคลาโฮมาถูกลอบสังหารอย่างเป็นระบบ เรื่องราวที่ถูกฝังซ่อนมานานหลายทศวรรษ",dir:"Martin Scorsese",cast:"Leonardo DiCaprio, Lily Gladstone, Robert De Niro",dur:"3h 26m",rating:"R",c:["#1a0a0a","#2a1a0a"],img:"https://image.tmdb.org/t/p/w500/dB6J9hLeAsWbIHDNm4IkpSGrAJT.jpg",top:1},
+  {id:15,title:"Talk to Me",year:2023,genre:["Horror","Thriller"],imdb:7.1,rt:94,syn:"กลุ่มวัยรุ่นค้นพบวิธีติดต่อวิญญาณผ่านมือเวทมนตร์ ความสนุกกลายเป็นฝันร้ายเมื่อวิญญาณไม่ยอมจากไป",dir:"Danny Philippou, Michael Philippou",cast:"Sophie Wilde, Miranda Otto",dur:"1h 35m",rating:"R",c:["#1a0a0a","#0a0a0a"],img:"https://image.tmdb.org/t/p/w500/kdPMUKAFK6MR2OtGbFYVAtY56T.jpg"},
+  {id:16,title:"Evil Dead Rise",year:2023,genre:["Horror","Action"],imdb:6.5,rt:83,syn:"หนังสือแห่งความตายถูกค้นพบในอพาร์ทเมนต์ในเมือง ส่งผลให้สมาชิกในครอบครัวถูกสิงและกลายเป็นอสูรร้าย",dir:"Lee Cronin",cast:"Lily Sullivan, Alyssa Sutherland",dur:"1h 36m",rating:"R",c:["#1a0808","#0a0a0a"],img:"https://image.tmdb.org/t/p/w500/5ik1jpFHLaoGHxFKbJqL0MJLwpl.jpg"},
+  {id:17,title:"The Menu",year:2022,genre:["Horror","Thriller","Comedy"],imdb:7.2,rt:89,syn:"คู่รักเดินทางไปยังเกาะห่างไกลเพื่ออาหารค่ำมูลค่าหลายแสน แต่เมนูมื้อค่ำนั้นมีความลับน่ากลัวซ่อนอยู่",dir:"Mark Mylod",cast:"Anya Taylor-Joy, Ralph Fiennes",dur:"1h 47m",rating:"R",c:["#1a1a0a","#0a1a1a"],img:"https://image.tmdb.org/t/p/w500/v3ZRS5Lkq2gC5pNGnYRTEaKPZLy.jpg"},
+  {id:18,title:"M3GAN",year:2022,genre:["Horror","Sci-Fi","Thriller"],imdb:6.4,rt:93,syn:"นักวิทยาศาสตร์สร้างตุ๊กตา AI เพื่อเป็นเพื่อนหลานสาว แต่ M3GAN กลายเป็นสิ่งมีชีวิตที่เกินควบคุม",dir:"Gerard Johnstone",cast:"Allison Williams, Violet McGraw",dur:"1h 42m",rating:"PG-13",c:["#0a0a1a","#0a1a0a"],img:"https://image.tmdb.org/t/p/w500/jSjIXFchMDPGqOp9bRBPCPbGjxF.jpg"},
+  {id:19,title:"Society of the Snow",year:2023,genre:["Drama","History","Thriller"],imdb:7.8,rt:88,syn:"เรื่องจริงของทีมรักบี้อุรุกวัยที่รอดชีวิตจากเครื่องบินตกในเทือกเขาแอนดีส การดิ้นรนอยู่รอดในสภาวะสุดขีด",dir:"J.A. Bayona",cast:"Enzo Vogrincic, Agustín Pardella",dur:"2h 24m",rating:"R",c:["#0a0a1a","#1a1a2a"],img:"https://image.tmdb.org/t/p/w500/k4Z0JFWv0MtMKXFUomilNKGECPT.jpg"},
+  {id:20,title:"American Fiction",year:2023,genre:["Drama","Comedy"],imdb:7.4,rt:92,syn:"นักเขียนผิวสีผิดหวังกับอุตสาหกรรมหนังสือจึงแต่งนิยายล้อเลียน แต่กลับกลายเป็นหนังสือขายดีที่สุด",dir:"Cord Jefferson",cast:"Jeffrey Wright, Tracee Ellis Ross",dur:"1h 57m",rating:"R",c:["#1a1a0a","#0a1a1a"],img:"https://image.tmdb.org/t/p/w500/4VLALv2i0r9LlDzUeVRqiijpFy5.jpg"},
+  {id:21,title:"Asteroid City",year:2023,genre:["Comedy","Drama","Sci-Fi"],imdb:6.6,rt:76,syn:"นักท่องเที่ยวและนักวิทยาศาสตร์ถูกกักตัวในเมืองทะเลทรายหลังจากมีเหตุการณ์จากจักรวาลที่ไม่อาจอธิบายได้",dir:"Wes Anderson",cast:"Jason Schwartzman, Scarlett Johansson, Tom Hanks",dur:"1h 45m",rating:"PG-13",c:["#1a0a0a","#2a1a0a"],img:"https://image.tmdb.org/t/p/w500/t5A4AXMaUnBKpS9jd4jdSSRIY3i.jpg"},
+  {id:22,title:"May December",year:2023,genre:["Drama","Comedy"],imdb:7.1,rt:90,syn:"นักแสดงมาสำรวจชีวิตของหญิงที่กลายเป็นข่าวอื้อฉาว แต่กลับพบว่าความจริงซับซ้อนกว่าที่คิด",dir:"Todd Haynes",cast:"Natalie Portman, Julianne Moore",dur:"1h 57m",rating:"R",c:["#1a0a1a","#0a0a1a"],img:"https://image.tmdb.org/t/p/w500/xbxA1nk1W8OuEoFBOYy5mGFfhLO.jpg"},
+  /* ── 2022 ── */
+  {id:23,title:"Everything Everywhere All at Once",year:2022,genre:["Action","Sci-Fi","Comedy"],imdb:7.8,rt:95,syn:"แม่บ้านธรรมดาค้นพบว่าตนเองต้องสำรวจจักรวาลคู่ขนานเพื่อช่วยโลก ชนะออสการ์ 7 รางวัลรวมถึง Best Picture",dir:"Daniel Kwan, Daniel Scheinert",cast:"Michelle Yeoh, Ke Huy Quan, Jamie Lee Curtis",dur:"2h 19m",rating:"R",c:["#1a0a2a","#2a1a0a"],img:"https://image.tmdb.org/t/p/w500/w3LxiVYdWWRvEVdn5RYq6jIqkb1.jpg",top:1,trend:1},
+  {id:24,title:"Top Gun: Maverick",year:2022,genre:["Action","Drama"],imdb:8.3,rt:96,syn:"Maverick กลับมาฝึกนักบินรุ่นใหม่สำหรับภารกิจที่อันตรายที่สุด ซีเควลที่ดีกว่าต้นฉบับ",dir:"Joseph Kosinski",cast:"Tom Cruise, Miles Teller, Jennifer Connelly",dur:"2h 10m",rating:"PG-13",c:["#0a1a2a","#1a2a3a"],img:"https://image.tmdb.org/t/p/w500/mqsPyyeDCBAghXyjbw4MBdb22r0.jpg",top:1,trend:1},
+  {id:25,title:"The Batman",year:2022,genre:["Action","Crime","Drama"],imdb:7.8,rt:85,syn:"Batman รุ่นใหม่ที่มืดและสมจริงที่สุด สืบสวนอาชญากรรมสุดซับซ้อนในก็อตแธมซิตี้",dir:"Matt Reeves",cast:"Robert Pattinson, Zoë Kravitz, Paul Dano",dur:"2h 56m",rating:"PG-13",c:["#0a0a0a","#1a0a1a"],img:"https://image.tmdb.org/t/p/w500/b0PlSFdDwbyK0cf5RxwDpaOJQvQ.jpg",top:1},
+  {id:26,title:"Glass Onion: A Knives Out Mystery",year:2022,genre:["Comedy","Mystery","Thriller"],imdb:7.1,rt:92,syn:"นักสืบ Benoit Blanc สืบคดีฆาตกรรมในปาร์ตี้บนเกาะส่วนตัวของมหาเศรษฐีเทคโนโลยี",dir:"Rian Johnson",cast:"Daniel Craig, Edward Norton, Janelle Monáe",dur:"2h 19m",rating:"PG-13",c:["#1a2a1a","#2a2a0a"],img:"https://image.tmdb.org/t/p/w500/vDGr1YdrlfbU9wxTOdpf3zChmv9.jpg"},
+  {id:27,title:"RRR",year:2022,genre:["Action","Drama","Adventure"],imdb:7.8,rt:95,syn:"นักสู้อิสรภาพสองคนในอินเดียยุคอาณานิคมต้องต่อสู้กับอังกฤษผู้กดขี่ หนังบอลลีวูดที่สนุกและยิ่งใหญ่มากที่สุด",dir:"S.S. Rajamouli",cast:"N.T. Rama Rao Jr., Ram Charan",dur:"3h 2m",rating:"NR",c:["#2a0a0a","#1a1a0a"],img:"https://image.tmdb.org/t/p/w500/1YPzFBnS3fJcXAnMiMPmq4E7w3.jpg",top:1},
+  {id:28,title:"The Banshees of Inisherin",year:2022,genre:["Drama","Comedy"],imdb:7.6,rt:97,syn:"เพื่อนสองคนบนเกาะไอร์แลนด์ที่หนึ่งในนั้นตัดสินใจยุติมิตรภาพโดยไม่มีเหตุผล ผลลัพธ์ที่ตามมาน่าหัวเราะและน่าเศร้า",dir:"Martin McDonagh",cast:"Colin Farrell, Brendan Gleeson",dur:"1h 54m",rating:"R",c:["#0a1a2a","#1a1a1a"],img:"https://image.tmdb.org/t/p/w500/4yFG6cSPaCaPhyJ1vtGOtMD4RMH.jpg",top:1},
+  {id:29,title:"Tár",year:2022,genre:["Drama","Music"],imdb:7.4,rt:91,syn:"วาทยากรหญิงผู้ยิ่งใหญ่เผชิญกับการล่มสลายของตัวเองจากความประมาทและการใช้อำนาจในทางที่ผิด",dir:"Todd Field",cast:"Cate Blanchett, Noémie Merlant",dur:"2h 38m",rating:"R",c:["#0a0a1a","#1a1a2a"],img:"https://image.tmdb.org/t/p/w500/grPnKNbUTnlaTLnHmqaFmh1LtRs.jpg",top:1},
+  {id:30,title:"Nope",year:2022,genre:["Horror","Sci-Fi","Mystery"],imdb:6.8,rt:83,syn:"พี่น้องคาวบอยค้นพบปรากฏการณ์ลึกลับในท้องฟ้าเหนือฟาร์มของพวกเขา สยองขวัญและ Sci-Fi ผสมกันอย่างชาญฉลาด",dir:"Jordan Peele",cast:"Daniel Kaluuya, Keke Palmer",dur:"2h 10m",rating:"R",c:["#0a0a1a","#1a0a0a"],img:"https://image.tmdb.org/t/p/w500/AcKVlWaNVVVFQwro3nLXqPljcYA.jpg"},
+  {id:31,title:"Avatar: The Way of Water",year:2022,genre:["Action","Adventure","Sci-Fi"],imdb:7.6,rt:76,syn:"Jake Sully และครอบครัวย้ายไปยังเผ่าทางน้ำ แต่ศัตรูเก่าตามมาคุกคาม ภาพที่สวยงามที่สุดในประวัติศาสตร์ภาพยนตร์",dir:"James Cameron",cast:"Sam Worthington, Zoe Saldana, Sigourney Weaver",dur:"3h 12m",rating:"PG-13",c:["#0a1a2a","#0a2a2a"],img:"https://image.tmdb.org/t/p/w500/t6HIqrRAclMCA60NsSmeqe9RmNV.jpg"},
+  /* ── 2023 extra ── */
+  {id:32,title:"Spider-Man: Across the Spider-Verse",year:2023,genre:["Animation","Action","Adventure"],imdb:8.6,rt:96,syn:"Miles Morales เดินทางข้ามมัลติเวิร์สพบกับ Spider-Man จากจักรวาลต่างๆ แอนิเมชั่นที่สวยงามและปฏิวัติวงการมากที่สุด",dir:"Joaquim Dos Santos, Kemp Powers",cast:"Shameik Moore, Hailee Steinfeld, Oscar Isaac",dur:"2h 20m",rating:"PG",c:["#1a0a2a","#2a0a1a"],img:"https://image.tmdb.org/t/p/w500/8Vt6mWEReuy4Of61Lnj5Xj704m8.jpg",top:1,trend:1},
+  {id:33,title:"Guardians of the Galaxy Vol. 3",year:2023,genre:["Action","Comedy","Superhero"],imdb:7.9,rt:82,syn:"กลุ่มผู้พิทักษ์กาแล็กซี่ต้องต่อสู้เพื่อปกป้อง Rocket Raccoon และเผชิญกับต้นกำเนิดที่น่าเจ็บปวดของเขา",dir:"James Gunn",cast:"Chris Pratt, Zoe Saldana, Bradley Cooper",dur:"2h 30m",rating:"PG-13",c:["#1a0a0a","#0a0a2a"],img:"https://image.tmdb.org/t/p/w500/r2J02Z2OpNTctfOSN1Ydgii51I3.jpg"},
+  {id:34,title:"John Wick: Chapter 4",year:2023,genre:["Action","Thriller","Crime"],imdb:7.7,rt:94,syn:"John Wick ต้องต่อสู้กับองค์กรสังหารนานาชาติเพื่อแลกกับอิสรภาพ ฉากต่อสู้ที่สุดยอดที่สุดเท่าที่มีมา",dir:"Chad Stahelski",cast:"Keanu Reeves, Donnie Yen, Bill Skarsgård",dur:"2h 49m",rating:"R",c:["#0a0a0a","#1a1a0a"],img:"https://image.tmdb.org/t/p/w500/vZloFAK7NmvMGKE7VkF5UHaz0I.jpg"},
+  {id:35,title:"Saltburn",year:2023,genre:["Drama","Thriller","Mystery"],imdb:7.0,rt:72,syn:"นักศึกษา Oxford ถูกเชิญไปพักที่คฤหาสน์หรูของเพื่อนที่ร่ำรวย แต่มีความลับมืดหมองซ่อนอยู่ใต้ผิวเรียบงาม",dir:"Emerald Fennell",cast:"Barry Keoghan, Jacob Elordi, Rosamund Pike",dur:"2h 11m",rating:"R",c:["#1a1a0a","#0a1a2a"],img:"https://image.tmdb.org/t/p/w500/qitHdM9A5lf5cnFaRlW5tCbmRlK.jpg"},
+  {id:36,title:"Godzilla Minus One",year:2023,genre:["Action","Sci-Fi","Drama"],imdb:7.9,rt:98,syn:"หลังสงครามโลกครั้งที่ 2 ญี่ปุ่นที่ถูกทำลายต้องเผชิญกับก็อดซิลลาร้ายแรงที่สุดเท่าที่มีมา ชนะออสการ์ Visual Effects",dir:"Takashi Yamazaki",cast:"Ryunosuke Kamiki, Minami Hamabe",dur:"2h 5m",rating:"PG-13",c:["#1a0a0a","#0a0a1a"],img:"https://image.tmdb.org/t/p/w500/rhr4y78pSzP9SuNQTKpn8vDJA4p.jpg",top:1},
+  {id:37,title:"The Zone of Interest",year:2023,genre:["Drama","History","War"],imdb:7.3,rt:93,syn:"ครอบครัวของผู้บัญชาการ Auschwitz ใช้ชีวิตธรรมดาอยู่ถัดจากค่ายกักกัน หนังสยองที่ไม่มีภาพรุนแรงแม้แต่ฉากเดียว",dir:"Jonathan Glazer",cast:"Christian Friedel, Sandra Hüller",dur:"1h 45m",rating:"PG-13",c:["#0a1a0a","#1a1a0a"],img:"https://image.tmdb.org/t/p/w500/hUu9zyZmKuTuOE0CpHCGEKmLHtk.jpg",top:1},
+  {id:38,title:"Mission: Impossible – Dead Reckoning",year:2023,genre:["Action","Adventure","Thriller"],imdb:7.7,rt:96,syn:"Ethan Hunt ต้องป้องกันอาวุธ AI ที่ทรงพลังที่สุดในโลกจากการตกอยู่ในมือผู้ไม่หวังดี",dir:"Christopher McQuarrie",cast:"Tom Cruise, Hayley Atwell, Ving Rhames",dur:"2h 43m",rating:"PG-13",c:["#0a0a1a","#1a1a1a"],img:"https://image.tmdb.org/t/p/w500/NNxYkU70HPurnNCSiCjYAmacwm.jpg"},
+  /* ── 2024 extra ── */
+  {id:39,title:"Conclave",year:2024,genre:["Drama","Thriller","Mystery"],imdb:7.4,rt:92,syn:"การเลือกตั้งพระสันตปาปาองค์ใหม่แฝงด้วยการเมืองและความลับที่อาจทำลายวาติกัน ระทึกขวัญโดยไม่มีฉากรุนแรง",dir:"Edward Berger",cast:"Ralph Fiennes, Stanley Tucci, John Lithgow",dur:"2h 1m",rating:"PG",c:["#1a1a1a","#0a0a1a"],img:"https://image.tmdb.org/t/p/w500/m1hyCGECeWNLBiME5oWMcQnJTOC.jpg",top:1,trend:1},
+  {id:40,title:"Anora",year:2024,genre:["Drama","Comedy","Romance"],imdb:7.9,rt:95,syn:"นักเต้นระบำหน้าผ้าในนิวยอร์กแต่งงานกับทายาทรัสเซีย แต่ครอบครัวของเขาไม่ยอมรับ ชนะ Palme d'Or",dir:"Sean Baker",cast:"Mikey Madison, Yura Borisov, Karren Karagulian",dur:"2h 19m",rating:"R",c:["#1a0a1a","#1a1a0a"],img:"https://image.tmdb.org/t/p/w500/8ZbybiGYe8XM4WGmGlhF0ec5R7u.jpg",top:1,trend:1},
+  {id:41,title:"The Wild Robot",year:2024,genre:["Animation","Adventure","Drama"],imdb:8.1,rt:98,syn:"หุ่นยนต์ถูกพัดขึ้นเกาะร้างและต้องเรียนรู้การดำรงชีวิตและการเป็นแม่ในธรรมชาติ DreamWorks ที่ดีที่สุดในรอบหลายปี",dir:"Chris Sanders",cast:"Lupita Nyong'o, Pedro Pascal, Kit Connor",dur:"1h 42m",rating:"PG",c:["#0a1a0a","#1a2a0a"],img:"https://image.tmdb.org/t/p/w500/wTnV3PCVW5O92JMrFvvrRcV39RU.jpg",top:1,trend:1},
+  {id:42,title:"The Brutalist",year:2024,genre:["Drama","History"],imdb:7.9,rt:88,syn:"สถาปนิก Holocaust survivor อพยพไปอเมริกาหลังสงคราม แต่กลับพบกับความหวังและความผิดหวังในดินแดนแห่งความฝัน",dir:"Brady Corbet",cast:"Adrien Brody, Felicity Jones, Guy Pearce",dur:"3h 35m",rating:"R",c:["#1a1a0a","#2a1a0a"],img:"https://image.tmdb.org/t/p/w500/czM5tHRJRMgHtYMm4Z9C3c8iqTH.jpg",top:1},
+  {id:43,title:"Longlegs",year:2024,genre:["Horror","Thriller","Crime"],imdb:5.9,rt:66,syn:"เจ้าหน้าที่ FBI สาวไล่ล่านักฆ่าลึกลับที่ทิ้งข้อความซาตานไว้ในที่เกิดเหตุมานานหลายทศวรรษ",dir:"Osgood Perkins",cast:"Maika Monroe, Nicolas Cage, Alicia Witt",dur:"1h 41m",rating:"R",c:["#1a0a0a","#0a0a0a"],img:"https://image.tmdb.org/t/p/w500/sFMcvIurHMijlgdlBu8UlKEJGY.jpg"},
+  {id:44,title:"Heretic",year:2024,genre:["Horror","Thriller","Drama"],imdb:7.1,rt:91,syn:"นักเทศน์ผู้ฉลาดหลักแหลมดักจับมิชชั่นนารีหนุ่มสาวสองคนและท้าทายความเชื่อของพวกเขาด้วยเกมจิตวิทยา",dir:"Scott Beck, Bryan Woods",cast:"Hugh Grant, Sophie Thatcher, Chloe East",dur:"1h 50m",rating:"R",c:["#1a1a0a","#0a0a1a"],img:"https://image.tmdb.org/t/p/w500/kKgQzkNrptrDh2pjMfYeBHi3fWj.jpg",trend:1},
+  {id:45,title:"Speak No Evil",year:2024,genre:["Horror","Thriller","Drama"],imdb:7.2,rt:94,syn:"ครอบครัวชาวอเมริกันไปพักที่บ้านคู่สมรสชาวยุโรปที่ดูเป็นมิตร แต่ซ่อนบางอย่างที่น่ากลัวไว้ภายใน",dir:"James Watkins",cast:"James McAvoy, Mackenzie Davis, Scoot McNairy",dur:"1h 50m",rating:"R",c:["#1a0a0a","#1a1a1a"],img:"https://image.tmdb.org/t/p/w500/26yQPXymbNVFwKS7SCWEE7KGvLD.jpg"},
+  {id:46,title:"Blink Twice",year:2024,genre:["Thriller","Mystery","Drama"],imdb:6.5,rt:69,syn:"หญิงสาวได้รับเชิญไปเกาะส่วนตัวของมหาเศรษฐีซิลิคอนวัลเลย์ และค่อยๆ รู้สึกว่ามีบางอย่างที่ผิดปกติอย่างมาก",dir:"Zoë Kravitz",cast:"Naomi Ackie, Channing Tatum, Christian Slater",dur:"1h 42m",rating:"R",c:["#0a1a1a","#1a0a1a"],img:"https://image.tmdb.org/t/p/w500/b5LL1JoCIPvTVqfM6FSLM2sIwVB.jpg"},
+  {id:47,title:"A Quiet Place: Day One",year:2024,genre:["Horror","Sci-Fi","Thriller"],imdb:7.0,rt:83,syn:"วันแรกที่มนุษย์ต่างดาวบุกโลก ผู้หญิงคนหนึ่งต้องเอาชีวิตรอดในนิวยอร์กที่กลายเป็นเงียบงัน",dir:"Michael Sarnoski",cast:"Lupita Nyong'o, Joseph Quinn, Alex Wolff",dur:"1h 39m",rating:"PG-13",c:["#0a0a1a","#0a1a0a"],img:"https://image.tmdb.org/t/p/w500/dV2TnNiNFVqfDiPSHWlNRIefS26.jpg"},
+  {id:48,title:"Civil War",year:2024,genre:["Action","Drama","Thriller"],imdb:7.1,rt:82,syn:"นักข่าวสงครามสี่คนเดินทางข้ามอเมริกาที่กำลังระอุสงครามกลางเมือง เพื่อถ่ายภาพประธานาธิบดีในช่วงสุดท้าย",dir:"Alex Garland",cast:"Kirsten Dunst, Wagner Moura, Cailee Spaeny",dur:"1h 49m",rating:"R",c:["#2a1a0a","#1a0a0a"],img:"https://image.tmdb.org/t/p/w500/sh7Rg8Er3tFcN9BpKIPOMvALgZd.jpg",trend:1},
+  {id:49,title:"Kinds of Kindness",year:2024,genre:["Drama","Comedy","Thriller"],imdb:6.5,rt:71,syn:"สามเรื่องราวที่เชื่อมต่อกัน ว่าด้วยการควบคุม การเชื่อฟัง และการสูญเสียตัวตนในสังคมสมัยใหม่",dir:"Yorgos Lanthimos",cast:"Emma Stone, Jesse Plemons, Margaret Qualley",dur:"2h 44m",rating:"R",c:["#0a1a1a","#1a0a1a"],img:"https://image.tmdb.org/t/p/w500/vVmFpVjKD14s4cFEHBuMHoFdCq5.jpg"},
+  /* ── 2018-2021 CLASSICS ── */
+  {id:50,title:"Interstellar",year:2014,genre:["Sci-Fi","Drama","Adventure"],imdb:8.7,rt:72,syn:"นักบินอวกาศออกเดินทางผ่านรูหนอนในจักรวาลเพื่อค้นหาบ้านใหม่ของมนุษยชาติที่กำลังจะสูญพันธุ์",dir:"Christopher Nolan",cast:"Matthew McConaughey, Anne Hathaway, Jessica Chastain",dur:"2h 49m",rating:"PG-13",c:["#0a0a1a","#1a0a2a"],img:"https://image.tmdb.org/t/p/w500/gEU2QniE6E77NI6lCU6MxlNBvIx.jpg",top:1},
+  {id:51,title:"The Dark Knight",year:2008,genre:["Action","Crime","Drama"],imdb:9.0,rt:94,syn:"แบทแมนเผชิญหน้ากับโจ๊กเกอร์ ผู้ก่อการร้ายสุดบ้าที่นำความโกลาหลมาสู่ก็อตแธม หนัง superhero ที่ดีที่สุดตลอดกาล",dir:"Christopher Nolan",cast:"Christian Bale, Heath Ledger, Aaron Eckhart",dur:"2h 32m",rating:"PG-13",c:["#0a0a0a","#1a1a0a"],img:"https://image.tmdb.org/t/p/w500/qJ2tW6WMUDux911r6m7haRef0WH.jpg",top:1},
+  {id:52,title:"Parasite",year:2019,genre:["Drama","Thriller","Crime"],imdb:8.5,rt:99,syn:"ครอบครัวยากจนแทรกซึมเข้าสู่ชีวิตของครอบครัวมหาเศรษฐี เรื่องราวสะท้อนความเหลื่อมล้ำอย่างจัดจ้านและสะเทือนใจ",dir:"Bong Joon-ho",cast:"Song Kang-ho, Lee Sun-kyun, Cho Yeo-jeong",dur:"2h 12m",rating:"R",c:["#1a1a0a","#0a1a0a"],img:"https://image.tmdb.org/t/p/w500/7IiTTgloROVzXt4R1JxUTd0Cs9y.jpg",top:1},
+  {id:53,title:"1917",year:2019,genre:["Drama","History","Action"],imdb:8.3,rt:89,syn:"ทหารอังกฤษสองนายต้องส่งสาส์นสำคัญข้ามแนวรบในสงครามโลกครั้งที่หนึ่ง ภาพยนตร์ที่ถ่ายทำให้ดูเหมือนช็อตเดียวยาวตลอดเรื่อง",dir:"Sam Mendes",cast:"George MacKay, Dean-Charles Chapman",dur:"1h 59m",rating:"R",c:["#1a1a0a","#0a1a0a"],img:"https://image.tmdb.org/t/p/w500/iZf0KyrE25z1sage4SYQLiiC3LH.jpg",top:1},
+  {id:54,title:"Joker",year:2019,genre:["Drama","Crime","Thriller"],imdb:8.4,rt:69,syn:"อาร์เธอร์ แฟลก นักตลกสายสเตนด์อัปที่ถูกสังคมทอดทิ้ง ค่อยๆ กลายเป็นอาชญากรสุดบ้าที่ก็อตแธมจะจำไม่ลืม",dir:"Todd Phillips",cast:"Joaquin Phoenix, Robert De Niro",dur:"2h 2m",rating:"R",c:["#1a0808","#2a1a08"],img:"https://image.tmdb.org/t/p/w500/udDclJoHjfjb8Ekgsd4FDteOkCU.jpg",top:1},
+  {id:55,title:"Dune: Part One",year:2021,genre:["Sci-Fi","Adventure","Drama"],imdb:8.0,rt:83,syn:"Paul Atreides หนุ่มผู้มีพรสวรรค์พิเศษเดินทางสู่ดาวเคราะห์ที่อันตรายที่สุดเพื่อปกป้องครอบครัวและประชาชน",dir:"Denis Villeneuve",cast:"Timothée Chalamet, Rebecca Ferguson, Oscar Isaac",dur:"2h 35m",rating:"PG-13",c:["#1a1a08","#2a1a08"],img:"https://image.tmdb.org/t/p/w500/d5NXSklpcvweasTZTdgB_dkSxce.jpg",top:1},
+  {id:56,title:"No Time to Die",year:2021,genre:["Action","Adventure","Thriller"],imdb:7.3,rt:83,syn:"เจมส์ บอนด์ ออกมาจากการเกษียณเพื่อต่อสู้กับผู้ร้ายที่ถือครองอาวุธร้ายแรงที่สุดที่เคยมีมา ภารกิจสุดท้ายของ Daniel Craig",dir:"Cary Joji Fukunaga",cast:"Daniel Craig, Rami Malek, Léa Seydoux",dur:"2h 43m",rating:"PG-13",c:["#0a0a1a","#1a0a0a"],img:"https://image.tmdb.org/t/p/w500/iUgygt3fscRoKWCV1d0C7FbM9TP.jpg"},
+  {id:57,title:"The Power of the Dog",year:2021,genre:["Drama","Western","Thriller"],imdb:6.8,rt:94,syn:"เจ้าของฟาร์มผู้หยิ่งยโสรังแกน้องชายและภรรยาของเขาอย่างโหดร้าย แต่การมาถึงของลูกชายที่บอบบางเปลี่ยนทุกอย่าง",dir:"Jane Campion",cast:"Benedict Cumberbatch, Kirsten Dunst, Jesse Plemons",dur:"2h 6m",rating:"R",c:["#2a1a08","#1a0a0a"],img:"https://image.tmdb.org/t/p/w500/vZ2pBEVRFOF80pyjGqVgm8wVwfj.jpg"},
+  {id:58,title:"Drive My Car",year:2021,genre:["Drama","Romance"],imdb:7.6,rt:98,syn:"ผู้กำกับละครเวทีที่กำลังจัดการกับการสูญเสียภรรยา ค้นพบความจริงและการเยียวยาในการเดินทางกับคนขับรถหญิงสาวเงียบขรึม",dir:"Ryûsuke Hamaguchi",cast:"Hidetoshi Nishijima, Tōko Miura",dur:"2h 59m",rating:"NR",c:["#0a1a1a","#1a1a0a"],img:"https://image.tmdb.org/t/p/w500/vsFcPAo2YBED3ZGaTnGHHsRfSWG.jpg"},
+  {id:59,title:"Encanto",year:2021,genre:["Animation","Comedy","Fantasy"],imdb:7.3,rt:92,syn:"ทุกคนในครอบครัว Madrigal มีพลังวิเศษ ยกเว้น Mirabel ซึ่งกำลังพยายามค้นหาสิ่งที่ทำให้เธอพิเศษ",dir:"Byron Howard, Jared Bush",cast:"Stephanie Beatriz, María Cecilia Botero",dur:"1h 39m",rating:"PG",c:["#1a0a2a","#2a1a0a"],img:"https://image.tmdb.org/t/p/w500/4j0PNHkMr5ax3IA8tjtxcmPU3QT.jpg"},
+  {id:60,title:"Pig",year:2021,genre:["Drama","Thriller"],imdb:7.1,rt:97,syn:"นักล่าเห็ดราในโอเรกอนออกตามหาหมูรักของเขาที่ถูกลักพาตัว ท่ามกลางโลกใต้ดินของอาหารชั้นสูง",dir:"Michael Sarnoski",cast:"Nicolas Cage, Alex Wolff",dur:"1h 32m",rating:"R",c:["#2a1a08","#1a1a0a"],img:"https://image.tmdb.org/t/p/w500/lMDmRBqkZVBpqIEbsO4bCOGdF0l.jpg"},
+  {id:61,title:"Nightmare Alley",year:2021,genre:["Thriller","Crime","Drama"],imdb:7.1,rt:80,syn:"นักแสดงคาร์นิวัลผู้มีความทะเยอทะยานใช้ทักษะล่อลวงกลายเป็นนักต้มตุ๋นระดับสูง จนกระทั่งพบเจอนักจิตวิทยาที่ฉลาดยิ่งกว่า",dir:"Guillermo del Toro",cast:"Bradley Cooper, Cate Blanchett, Rooney Mara",dur:"2h 30m",rating:"R",c:["#0a0a1a","#1a0808"],img:"https://image.tmdb.org/t/p/w500/vNCtBYnMnS1VHJjkQVDX3NFMvEH.jpg"},
+  {id:62,title:"Marriage Story",year:2019,genre:["Drama","Romance","Comedy"],imdb:7.9,rt:95,syn:"การหย่าร้างที่เต็มไปด้วยความเจ็บปวดของนักแสดงและนักกำกับ เรื่องราวที่สะท้อนถึงความสัมพันธ์และการสูญเสียอย่างจริงใจ",dir:"Noah Baumbach",cast:"Adam Driver, Scarlett Johansson",dur:"2h 17m",rating:"R",c:["#1a0a0a","#0a0a1a"],img:"https://image.tmdb.org/t/p/w500/pZekG6xabTmZxjmYw10wZKBXCUQ.jpg",top:1},
+  {id:63,title:"Knives Out",year:2019,genre:["Crime","Drama","Comedy"],imdb:7.9,rt:97,syn:"นักสืบสุดแยบยลต้องสืบสวนการตายลึกลับของนักเขียนมหาเศรษฐี ในคืนที่ครอบครัวพร้อมหน้าพร้อมตา",dir:"Rian Johnson",cast:"Daniel Craig, Ana de Armas, Chris Evans",dur:"2h 10m",rating:"PG-13",c:["#1a0a0a","#1a1a0a"],img:"https://image.tmdb.org/t/p/w500/pThyQovXQrqVzdZT9xt1p1LCPLm.jpg",top:1},
+  {id:64,title:"Ford v Ferrari",year:2019,genre:["Drama","Action","History"],imdb:8.1,rt:92,syn:"นักออกแบบรถ Carroll Shelby และนักแข่ง Ken Miles ท้าทาย Ferrari ในการแข่งขัน Le Mans '66 ที่กลายเป็นตำนาน",dir:"James Mangold",cast:"Matt Damon, Christian Bale",dur:"2h 32m",rating:"PG-13",c:["#2a1a08","#1a0a0a"],img:"https://image.tmdb.org/t/p/w500/6ApDtO7xaWAfnVp3i6nLkMFbxwM.jpg"},
+  {id:65,title:"Once Upon a Time in Hollywood",year:2019,genre:["Drama","Comedy","History"],imdb:7.6,rt:84,syn:"นักแสดงผู้ซีดจางและสตั๊นท์แมนคู่หูอยู่ในฮอลลีวูดยุค 60 ขณะที่โศกนาฏกรรมชารอน เทตกำลังใกล้มาถึง",dir:"Quentin Tarantino",cast:"Leonardo DiCaprio, Brad Pitt, Margot Robbie",dur:"2h 41m",rating:"R",c:["#2a1a08","#1a0a0a"],img:"https://image.tmdb.org/t/p/w500/8j58iEBw9pOXFD2L0nt0ZXeHviB.jpg"},
+  {id:66,title:"The Lighthouse",year:2019,genre:["Horror","Drama","Thriller"],imdb:7.4,rt:91,syn:"คนเฝ้าประภาคารสองคนติดอยู่บนเกาะเล็กๆ ใน New England ความบ้าคลั่งและตำนานทะเลเริ่มกลืนกินพวกเขา",dir:"Robert Eggers",cast:"Willem Dafoe, Robert Pattinson",dur:"1h 49m",rating:"R",c:["#0a0a0a","#1a1a0a"],img:"https://image.tmdb.org/t/p/w500/3rNHfpjHVJFmHSs2xGKJuWXEuYm.jpg"},
+  {id:67,title:"Midsommar",year:2019,genre:["Horror","Drama","Mystery"],imdb:7.1,rt:83,syn:"กลุ่มนักศึกษาอเมริกันเดินทางไปสวีเดนเพื่อร่วมเทศกาลพื้นบ้านที่ไม่มีความมืดค่ำ แต่สิ่งที่รอพวกเขาอยู่นั้นน่าสยดสยอง",dir:"Ari Aster",cast:"Florence Pugh, Jack Reynor",dur:"2h 27m",rating:"R",c:["#1a1a08","#0a1a0a"],img:"https://image.tmdb.org/t/p/w500/7LEI8ulZzO5gy9Ww2NVCrKmHeDZ.jpg"},
+  {id:68,title:"Us",year:2019,genre:["Horror","Thriller"],imdb:6.8,rt:93,syn:"ครอบครัวที่มาพักผ่อนริมทะเลถูกรุกรานโดยผู้บุกรุกที่เป็นเงาของพวกเขาเอง ความน่ากลัวที่มาจากภายใน",dir:"Jordan Peele",cast:"Lupita Nyong'o, Winston Duke",dur:"1h 56m",rating:"R",c:["#1a0a0a","#0a0a0a"],img:"https://image.tmdb.org/t/p/w500/ux2maFSSTZcv1ZJ9xPzH0UFiHUm.jpg"},
+  {id:69,title:"Avengers: Endgame",year:2019,genre:["Action","Superhero","Adventure"],imdb:8.4,rt:94,syn:"หลังจาก Thanos ทำลายครึ่งหนึ่งของจักรวาล Avengers รวมพลังครั้งสุดท้ายเพื่อย้อนเวลาและกอบกู้ทุกอย่าง",dir:"Anthony Russo, Joe Russo",cast:"Robert Downey Jr., Chris Evans, Mark Ruffalo",dur:"3h 1m",rating:"PG-13",c:["#0a0a1a","#1a0808"],img:"https://image.tmdb.org/t/p/w500/or06FN3Dka5tukK1e9sl16pB3iy.jpg",top:1},
+  {id:70,title:"Black Panther",year:2018,genre:["Action","Superhero","Drama"],imdb:7.3,rt:96,syn:"T'Challa กลับสู่ Wakanda เพื่อสืบราชบัลลังก์แต่ต้องเผชิญกับคู่แข่งที่จะท้าทายการครองบัลลังก์และทิศทางของประเทศ",dir:"Ryan Coogler",cast:"Chadwick Boseman, Michael B. Jordan, Lupita Nyong'o",dur:"2h 14m",rating:"PG-13",c:["#0a0a1a","#1a0a0a"],img:"https://image.tmdb.org/t/p/w500/uxzzxijgPIY7slzFvMotPv8wjKA.jpg"},
+  {id:71,title:"A Quiet Place",year:2018,genre:["Horror","Sci-Fi","Drama"],imdb:7.5,rt:97,syn:"ครอบครัวหนึ่งดำรงชีวิตอยู่อย่างเงียบงันในโลกที่ถูกรุกรานโดยสิ่งมีชีวิตที่ล่าด้วยเสียง ทุกเสียงคือความตาย",dir:"John Krasinski",cast:"Emily Blunt, John Krasinski",dur:"1h 30m",rating:"PG-13",c:["#1a1a08","#0a0a0a"],img:"https://image.tmdb.org/t/p/w500/nAU74GmpUk7t5iklEp3bufnDKia.jpg"},
+  {id:72,title:"Hereditary",year:2018,genre:["Horror","Drama","Mystery"],imdb:7.3,rt:89,syn:"หลังยายเสียชีวิต ครอบครัวหนึ่งค้นพบความลับอันน่าสยดสยองในประวัติศาสตร์ของพวกเขา สยองขวัญที่ยังคงหลอกหลอนหลังดูจบ",dir:"Ari Aster",cast:"Toni Collette, Gabriel Byrne, Alex Wolff",dur:"2h 7m",rating:"R",c:["#1a0808","#0a0808"],img:"https://image.tmdb.org/t/p/w500/t3zLZiDHCTnDPi3Fzje8FLdCNFW.jpg"},
+  {id:73,title:"Roma",year:2018,genre:["Drama"],imdb:7.7,rt:96,syn:"แม่บ้านในเม็กซิโกซิตี้ค.ศ.1970 ดำรงชีวิตอยู่ท่ามกลางความสับสนวุ่นวายทางการเมืองและส่วนตัว ผลงานกึ่งอัตชีวประวัติที่สวยงามระดับมาสเตอร์พีซ",dir:"Alfonso Cuarón",cast:"Yalitza Aparicio, Marina de Tavira",dur:"2h 15m",rating:"R",c:["#0a0a0a","#1a1a1a"],img:"https://image.tmdb.org/t/p/w500/dtGSHCPCcaHNrNFoCpJfJjvFqr0.jpg",top:1},
+  {id:74,title:"Green Book",year:2018,genre:["Drama","Comedy","History"],imdb:8.2,rt:78,syn:"นักเปียโนดำผู้มีชื่อเสียงและคนขับรถผิวขาวเดินทางทัวร์คอนเสิร์ตทางใต้ของอเมริกา ในยุค Jim Crow สร้างมิตรภาพที่ข้ามพ้นอคติ",dir:"Peter Farrelly",cast:"Viggo Mortensen, Mahershala Ali",dur:"2h 10m",rating:"PG-13",c:["#1a1a08","#2a1a08"],img:"https://image.tmdb.org/t/p/w500/7BsvSuDQuoqhWmU2fL7W2GOcZHU.jpg",top:1}
+];
+
+const ICONS = {'Sci-Fi':'🌌','Horror':'💀','Action':'⚡','Drama':'🎭','Comedy':'😄','Romance':'❤️','Thriller':'🔪','Animation':'✨','Adventure':'🗺️','History':'📜','Crime':'🔍','Fantasy':'🔮','Superhero':'🦸'};
+
+// ═══ STREAMING DATA ═══
+const STREAMING = {
+  0:['Max','Prime Video'],1:['MUBI','Prime Video'],2:['Disney+'],3:['Disney+'],
+  4:['Disney+'],5:['Netflix'],6:['Max','Prime Video'],7:['Prime Video'],
+  8:['Netflix','Peacock'],9:['Max','Paramount+'],10:['Disney+','Hulu'],
+  11:['Peacock','Prime Video'],12:['MUBI','Netflix'],13:['Disney+','Hulu'],
+  14:['Apple TV+'],15:['Prime Video'],16:['Max'],17:['Max','Disney+'],
+  18:['Peacock','Netflix'],19:['Netflix'],20:['Prime Video'],
+  21:['Prime Video','MUBI'],22:['Netflix'],23:['Netflix','Paramount+'],
+  24:['Paramount+','Netflix'],25:['Max'],26:['Netflix'],27:['Netflix'],
+  28:['Disney+','Hulu'],29:['Peacock','Prime Video'],30:['Peacock','Netflix'],
+  31:['Disney+'],32:['Netflix','Disney+'],33:['Disney+'],34:['Peacock','Prime Video'],
+  35:['Prime Video'],36:['Netflix'],37:['MUBI','Prime Video'],38:['Paramount+'],
+  39:['Max','Prime Video'],40:['Max'],41:['Netflix'],42:['Prime Video','Max'],
+  43:['Hulu','Prime Video'],44:['Prime Video'],45:['Prime Video'],
+  46:['Prime Video'],47:['Paramount+'],48:['Max'],49:['Hulu'],
+  50:['Paramount+','Netflix'],51:['Max'],52:['Hulu','Max','Prime Video'],
+  53:['Netflix','Prime Video'],54:['Max'],55:['Max','Netflix'],
+  56:['Paramount+'],57:['Netflix'],58:['MUBI','Netflix'],59:['Disney+'],
+  60:['Hulu','Prime Video'],61:['Max','Hulu'],62:['Netflix'],63:['Prime Video'],
+  64:['Disney+','Hulu'],65:['Netflix'],66:['Prime Video'],67:['Prime Video','Hulu'],
+  68:['Peacock','Netflix'],69:['Disney+'],70:['Disney+'],71:['Paramount+'],
+  72:['Prime Video'],73:['Netflix'],74:['Netflix','Max']
+};
+const PLAT_CLS = {
+  'Netflix':'netflix','Disney+':'disney','Prime Video':'prime',
+  'Max':'max','Apple TV+':'apple','MUBI':'mubi','Hulu':'hulu',
+  'Paramount+':'paramount','Peacock':'peacock'
+};
+
+// ═══ POSTER ═══
+function poster(m){
+  const icon = ICONS[m.genre[0]]||'🎬';
+  const hasImg = !!m.img;
+  const imgEl = hasImg
+    ? `<img src="${m.img}" class="poster-img" alt="${m.title}" loading="lazy" onerror="this.style.display='none';this.previousElementSibling.style.opacity='0.07';this.closest('.poster-inner').querySelector('.poster-top').style.display='block'">`
+    : '';
+  return `<div class="poster-inner" style="background:linear-gradient(135deg,${m.c[0]} 0%,${m.c[1]} 100%)">
+    <div class="poster-icon" style="opacity:${hasImg?'0':'0.07'}">${icon}</div>
+    ${imgEl}
+    <div class="poster-grad"></div>
+    <div class="yr-badge">${m.year}</div>
+    <div class="imdb-badge">⭐ ${m.imdb}</div>
+    <div class="poster-top" style="display:${hasImg?'none':'block'}">${m.title}</div>
+  </div>`;
+}
+
+// ═══ CARD ═══
+function card(m,gc=''){
+  return `<div class="card${gc?' '+gc:''}" onclick="openModal(${m.id})">
+    <div class="poster">${poster(m)}</div>
+    <div class="card-title">${m.title}</div>
+    <div class="card-meta">
+      <span class="mi">⭐ ${m.imdb}</span>
+      <span class="mrt">🍅 ${m.rt}%</span>
+      <span class="myr">${m.year}</span>
+    </div>
+  </div>`;
+}
+
+// ═══ POPULATE ═══
+function populate(){
+  document.getElementById('trend-row').innerHTML = MOVIES.filter(m=>m.trend).map(m=>card(m)).join('');
+  document.getElementById('top-grid').innerHTML = [...MOVIES].sort((a,b)=>b.imdb-a.imdb).slice(0,8).map(m=>card(m,'gc')).join('');
+  document.getElementById('scifi-row').innerHTML = MOVIES.filter(m=>m.genre.includes('Sci-Fi')).map(m=>card(m)).join('');
+  document.getElementById('horror-row').innerHTML = MOVIES.filter(m=>m.genre.includes('Horror')||m.genre.includes('Thriller')).map(m=>card(m)).join('');
+  document.getElementById('drama-row').innerHTML = MOVIES.filter(m=>m.genre.includes('Drama')).map(m=>card(m)).join('');
+}
+
+// ═══ SEARCH ═══
+let srchT;
+function doSearch(q){
+  clearTimeout(srchT);
+  srchT = setTimeout(()=>{
+    const sec = document.getElementById('res-sec');
+    if(!q.trim()){sec.style.display='none';return}
+    const ql = q.toLowerCase();
+    const res = MOVIES.filter(m=>
+      m.title.toLowerCase().includes(ql)||
+      m.dir.toLowerCase().includes(ql)||
+      m.cast.toLowerCase().includes(ql)||
+      m.genre.some(g=>g.toLowerCase().includes(ql))||
+      m.year.toString().includes(ql)
+    );
+    sec.style.display='block';
+    document.getElementById('res-title').innerHTML=`<span class="dot"></span>ผลการค้นหา "${q}"`;
+    document.getElementById('res-grid').innerHTML = res.length
+      ? res.map(m=>card(m,'gc')).join('')
+      : `<div class="empty"><div class="empty-icon">🔍</div><div>ไม่พบ "${q}"</div><div style="font-size:.82rem;margin-top:7px">ลองถาม AI ได้เลย!</div><button class="btn-o" style="margin-top:14px;font-size:.82rem;padding:8px 18px;cursor:pointer" onclick="openChatWith('แนะนำหนัง ${q}')">🤖 ถาม AI</button></div>`;
+    sec.scrollIntoView({behavior:'smooth',block:'nearest'});
+  },280);
+}
+
+// ═══ FILTER ═══
+let curGenre='all', curYear='all';
+function setGenre(g,btn){
+  curGenre=g;
+  document.querySelectorAll('.fbtn').forEach(b=>b.classList.remove('active'));
+  if(btn) btn.classList.add('active');
+  applyFilter();
+}
+function setYear(y){curYear=y;applyFilter()}
+const GENRE_TH={'Action':'แอ็คชั่น','Drama':'ดราม่า','Horror':'สยองขวัญ','Sci-Fi':'ไซ-ไฟ','Comedy':'คอเมดี้','Thriller':'ระทึกขวัญ','Animation':'แอนิเมชั่น'};
+function applyFilter(){
+  let f=[...MOVIES];
+  if(curGenre!=='all') f=f.filter(m=>m.genre.includes(curGenre));
+  if(curYear!=='all') f=f.filter(m=>m.year.toString()===curYear);
+  if(curGenre==='all'&&curYear==='all'){document.getElementById('res-sec').style.display='none';return}
+  const lbl=(GENRE_TH[curGenre]||curGenre)||'ทั้งหมด';
+  const ylbl=curYear!=='all'?` ปี ${curYear}`:'';
+  document.getElementById('res-title').innerHTML=`<span class="dot"></span>หนัง${lbl}${ylbl}`;
+  document.getElementById('res-grid').innerHTML=f.length?f.map(m=>card(m,'gc')).join(''):`<div class="empty"><div class="empty-icon">😕</div><div>ไม่พบหนังในหมวดนี้</div></div>`;
+  document.getElementById('res-sec').style.display='block';
+  document.getElementById('res-sec').scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+
+// ═══ SORT ═══
+function doSort(by){
+  let s=[...MOVIES];
+  if(by==='imdb') s.sort((a,b)=>b.imdb-a.imdb);
+  else if(by==='rt') s.sort((a,b)=>b.rt-a.rt);
+  else if(by==='new') s.sort((a,b)=>b.year-a.year);
+  else if(by==='old') s.sort((a,b)=>a.year-b.year);
+  document.getElementById('top-grid').innerHTML=s.slice(0,8).map(m=>card(m,'gc')).join('');
+}
+
+// ═══ MODAL ═══
+function openModal(id){
+  const m=MOVIES.find(x=>x.id===id);if(!m)return;
+  const icon=ICONS[m.genre[0]]||'🎬';
+  const bg=`linear-gradient(160deg,${m.c[0]} 0%,${m.c[1]} 100%)`;
+  const pw=document.getElementById('m-poster-wrap');
+  pw.style.background=bg;
+  if(m.img){
+    pw.innerHTML=`<img src="${m.img}" alt="${m.title}" style="width:100%;height:100%;object-fit:cover;object-position:center top;display:block" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"><div class="m-poster-fb" style="display:none"><div class="m-poster-fb-icon">${icon}</div><div class="m-poster-fb-title">${m.title}</div><div class="m-poster-fb-genre">${m.genre[0].toUpperCase()}</div></div>`;
+  } else {
+    pw.innerHTML=`<div class="m-poster-fb"><div class="m-poster-fb-icon">${icon}</div><div class="m-poster-fb-title">${m.title}</div><div class="m-poster-fb-genre">${m.genre[0].toUpperCase()}</div></div>`;
+  }
+  document.getElementById('m-ttl').textContent=m.title;
+  document.getElementById('m-imdb').textContent=m.imdb;
+  document.getElementById('m-rt').textContent=m.rt+'%';
+  document.getElementById('m-meta').textContent=`${m.year} · ${m.dur} · ${m.rating}`;
+  document.getElementById('m-syn').textContent=m.syn;
+  document.getElementById('m-dir').textContent=m.dir;
+  document.getElementById('m-yr').textContent=m.year;
+  document.getElementById('m-dur').textContent=m.dur;
+  document.getElementById('m-cast').textContent=m.cast;
+  document.getElementById('m-tags').innerHTML=m.genre.map(g=>`<span class="g-pill">${g}</span>`).join('');
+  const streams=STREAMING[m.id]||[];
+  const streamWrap=document.getElementById('m-stream');
+  if(streams.length){
+    document.getElementById('m-badges').innerHTML=streams.map(s=>`<span class="plat plat-${PLAT_CLS[s]||'prime'}">${s}</span>`).join('');
+    streamWrap.style.display='block';
+  } else { streamWrap.style.display='none'; }
+  document.getElementById('modal-ov').classList.add('open');
+  document.body.style.overflow='hidden';
+}
+function closeModal(){
+  document.getElementById('modal-ov').classList.remove('open');
+  document.body.style.overflow='';
+}
+
+// ═══ CHAT ═══
+let chatOpen=false;
+function toggleChat(){
+  chatOpen=!chatOpen;
+  document.getElementById('chat-panel').classList.toggle('open',chatOpen);
+  if(chatOpen) setTimeout(()=>document.getElementById('chat-in').focus(),300);
+}
+function openChatWith(msg){
+  chatOpen=true;
+  document.getElementById('chat-panel').classList.add('open');
+  setTimeout(()=>{document.getElementById('chat-in').value=msg;sendChat()},350);
+}
+function quickMsg(msg){document.getElementById('chat-in').value=msg;sendChat()}
+
+function addMsg(txt,type){
+  const c=document.getElementById('msgs');
+  const now=new Date().toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit'});
+  const d=document.createElement('div');
+  d.className=`msg ${type} fi`;
+  d.innerHTML=`<div class="bubble">${txt}</div><span class="msg-time">${now}</span>`;
+  c.appendChild(d); c.scrollTop=c.scrollHeight;
+}
+function showTyp(){
+  const c=document.getElementById('msgs');
+  const d=document.createElement('div');
+  d.className='msg a'; d.id='typ';
+  d.innerHTML='<div class="typing"><div class="td"></div><div class="td"></div><div class="td"></div></div>';
+  c.appendChild(d); c.scrollTop=c.scrollHeight;
+}
+function hideTyp(){const e=document.getElementById('typ');if(e)e.remove()}
+
+function aiReply(q){
+  const ql=q.toLowerCase();
+  if(ql.includes('sci-fi')||ql.includes('ไซ-ไฟ')||ql.includes('อวกาศ')||ql.includes('วิทยาศาสตร์'))
+    return `🚀 <strong>หนัง Sci-Fi ที่แนะนำ:</strong><br><br>1. 🏆 <strong>Dune: Part Two (2024)</strong> — ⭐8.5 | 🍅92%<br>มหากาพย์อวกาศที่ยิ่งใหญ่ที่สุดในรอบหลายปี<br><br>2. 🤖 <strong>Poor Things (2023)</strong> — ⭐7.9 | 🍅91%<br>Sci-Fi แนวศิลปะ ชนะ Oscar หลายสาขา<br><br>3. 👾 <strong>M3GAN (2022)</strong> — ⭐6.4 | 🍅93%<br>AI ที่น่ากลัวในแบบที่สนุกสุดๆ<br><br>คลิกที่การ์ดหนังเพื่อดูข้อมูลเพิ่มเติมได้เลย! 🎬`;
+  if(ql.includes('horror')||ql.includes('สยอง')||ql.includes('ผี')||ql.includes('น่ากลัว'))
+    return `👻 <strong>หนังสยองขวัญที่ต้องดู:</strong><br><br>1. 🏆 <strong>Talk to Me (2023)</strong> — ⭐7.1 | 🍅94%<br>สยองขวัญออสเตรเลียติดอันดับดีที่สุดแห่งปี<br><br>2. 👽 <strong>Alien: Romulus (2024)</strong> — ⭐7.4 | 🍅80%<br>ภาค Alien ที่กลับมาน่ากลัวอีกครั้ง<br><br>3. 🍽️ <strong>The Menu (2022)</strong> — ⭐7.2 | 🍅89%<br>สยองขวัญผสมดราม่าที่ฉลาดมาก<br><br>4. 💊 <strong>The Substance (2024)</strong> — ⭐7.0 | 🍅89%<br>Body horror สุดอาร์ตที่จะจำไปนานมาก`;
+  if(ql.includes('drama')||ql.includes('ดราม่า')||ql.includes('ซึ้ง'))
+    return `🎭 <strong>หนังดราม่าที่ดีที่สุด:</strong><br><br>1. ❤️ <strong>Past Lives (2023)</strong> — ⭐7.9 | 🍅97%<br>หนังรักที่ซึ้งที่สุดในรอบหลายปี ร้องแน่นอน<br><br>2. 📜 <strong>Oppenheimer (2023)</strong> — ⭐8.9 | 🍅93%<br>มาสเตอร์พีซจาก Christopher Nolan<br><br>3. ✊ <strong>Killers of the Flower Moon</strong> — ⭐7.6 | 🍅93%<br>Scorsese ทำงานได้ยอดเยี่ยม<br><br>4. ☃️ <strong>Society of the Snow (2023)</strong> — ⭐7.8 | 🍅88%<br>เรื่องจริงที่ขนลุกและซึ้งสุดๆ`;
+  if(ql.includes('action')||ql.includes('แอ็คชั่น')||ql.includes('บู๊'))
+    return `⚡ <strong>หนังแอ็คชั่นระทึก:</strong><br><br>1. 🌪️ <strong>Furiosa (2024)</strong> — ⭐7.8 | 🍅90%<br>Prequel ที่ยิ่งใหญ่ ฉากแอ็คชั่นสุดมัน<br><br>2. 🦸 <strong>Deadpool & Wolverine (2024)</strong> — ⭐7.6 | 🍅79%<br>Ryan Reynolds + Hugh Jackman = สนุกพีค<br><br>3. 🏜️ <strong>Dune: Part Two (2024)</strong> — ⭐8.5 | 🍅92%<br>มหากาพย์ที่มีทั้งแอ็คชั่นและความลึก`;
+  if(ql.includes('oscar')||ql.includes('ออสการ์')||ql.includes('รางวัล'))
+    return `🏆 <strong>หนังรางวัล Oscar 2024:</strong><br><br>🥇 <strong>Oppenheimer</strong> — Best Picture, Best Director<br>⭐8.9 | 🍅93% | Nolan คว้า Oscar ครั้งแรก!<br><br>🥇 <strong>Poor Things</strong> — Emma Stone ชนะ Best Actress<br>⭐7.9 | 🍅91%<br><br>🥇 <strong>American Fiction</strong> — Best Adapted Screenplay<br>⭐7.4 | 🍅92%<br><br>🥇 <strong>Da'Vine Joy Randolph</strong> ชนะ Best Supporting Actress จาก The Holdovers`;
+  if(ql.includes('2024')||ql.includes('ล่าสุด')||ql.includes('ใหม่')||ql.includes('ยอดนิยม'))
+    return `🔥 <strong>หนังยอดนิยมปี 2024:</strong><br><br>1. 🏜️ <strong>Dune: Part Two</strong> — ⭐8.5 | 🍅92%<br>2. ⚡ <strong>Deadpool & Wolverine</strong> — ⭐7.6 | 🍅79%<br>3. 🎯 <strong>Hit Man</strong> — ⭐7.6 | 🍅97% ← Hidden gem!<br>4. 🚗 <strong>Furiosa</strong> — ⭐7.8 | 🍅90%<br>5. 😱 <strong>The Substance</strong> — ⭐7.0 | 🍅89%<br>6. 🌪️ <strong>Twisters</strong> — ⭐7.1 | 🍅79%<br><br>Hit Man เป็น hidden gem ที่ไม่ควรพลาด! RT 97%! 🎯`;
+  if(ql.includes('animation')||ql.includes('แอนิเมชั่น')||ql.includes('การ์ตูน'))
+    return `✨ <strong>หนังแอนิเมชั่นแนะนำ:</strong><br><br>1. 🎭 <strong>Inside Out 2 (2024)</strong> — ⭐7.6 | 🍅90%<br>Pixar กลับมาพร้อม Anxiety ตัวใหม่ น่ารักและซึ้ง<br><br>2. 🌊 <strong>The Boy and the Heron (2023)</strong><br>Miyazaki มาสเตอร์พีซ ชนะ Oscar Best Animated<br><br>3. 🕷️ <strong>Spider-Man: Across the Spider-Verse</strong><br>Visual ที่สวยที่สุดในประวัติศาสตร์แอนิเมชั่น`;
+  if(ql.includes('คล้าย')||ql.includes('แบบ')||ql.includes('dune'))
+    return `🎬 <strong>ถ้าชอบ Dune ลองดู:</strong><br><br>1. 🌌 <strong>Interstellar (2014)</strong> — ⭐8.7 | 🍅73%<br>มหากาพย์อวกาศจาก Nolan<br><br>2. 🤖 <strong>Blade Runner 2049 (2017)</strong> — ⭐8.0 | 🍅88%<br>Sci-Fi งดงาม กำกับโดย Villeneuve เช่นกัน!<br><br>3. 🚀 <strong>Arrival (2016)</strong> — ⭐7.9 | 🍅94%<br>Sci-Fi ชั้นเลิศ ผู้กำกับคนเดียวกับ Dune`;
+  if(ql.includes('สวัสดี')||ql.includes('hello')||ql.length<4)
+    return `สวัสดีค่ะ! 🎬<br><br>ลองบอกฉันว่า:<br>• ชอบหนังแนวไหน? (Sci-Fi, ดราม่า, สยองขวัญ...)<br>• อยากดูหนัง Oscar ปีนี้?<br>• หนังยอดนิยมปี 2024 มีอะไรบ้าง?<br>• ชอบหนังอะไร แล้วอยากดูหนังคล้ายๆ?`;
+  const top=[...MOVIES].sort((a,b)=>b.imdb-a.imdb).slice(0,3);
+  return `🎬 <strong>หนังที่แนะนำ:</strong><br><br>${top.map((m,i)=>`${i+1}. <strong>${m.title} (${m.year})</strong> — ⭐${m.imdb} | 🍅${m.rt}%`).join('<br>')}<br><br>หรือบอกฉันว่าชอบหนังแนวไหน? เช่น Sci-Fi, สยองขวัญ, ดราม่า 😊`;
+}
+
+function sendChat(){
+  const inp=document.getElementById('chat-in');
+  const msg=inp.value.trim();if(!msg)return;
+  addMsg(msg,'u'); inp.value='';
+  showTyp();
+  setTimeout(()=>{hideTyp();addMsg(aiReply(msg),'a')},700+Math.random()*500);
+}
+
+// ═══ SCROLL TOP ═══
+window.addEventListener('scroll',()=>{
+  document.getElementById('top-btn').classList.toggle('vis',scrollY>400);
+});
+
+// ═══ KEYBOARD ═══
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape'){closeModal();if(chatOpen)toggleChat()}
+  if(e.key==='/'&&e.target!==document.getElementById('si')&&e.target!==document.getElementById('chat-in')){
+    e.preventDefault();document.getElementById('si').focus();
+  }
+});
+
+// ═══ INIT ═══
+populate();
+</script>
+</body>
+</html>
